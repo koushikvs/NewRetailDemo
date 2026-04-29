@@ -28,6 +28,8 @@
       --ms-purple:     #8661C5;
       --ms-magenta:    #B4009E;
       --sap-blue:      #0A6ED1;
+      --vas-accent:    #ff9f0a;
+      --vas-accent-2:  #fcd34d;
     }
     [data-theme="light"] {
       --bg:            #f5f5f7;
@@ -90,7 +92,7 @@
 
     /* HERO */
     .uc-hero {
-      max-width: 1200px; margin: 0 auto; padding: 4rem 1.5rem 2rem;
+      max-width: 1200px; margin: 0 auto; padding: 3.4rem 1.5rem 1.4rem;
       text-align: center;
     }
     .uc-eyebrow {
@@ -99,23 +101,68 @@
       margin-bottom: 0.8rem;
     }
     .uc-hero h1 {
-      font-size: clamp(2rem, 4vw, 3rem); font-weight: 700;
-      letter-spacing: -0.02em; line-height: 1.05;
+      font-size: clamp(2rem, 4vw, 2.85rem); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.1;
       font-family: "SF Pro Display", "Helvetica Neue", sans-serif;
+      margin-bottom: 0.85rem;
+    }
+    .uc-hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #2997ff, #5ac8fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .uc-hero p.lead {
+      font-size: 1rem; color: var(--text-2); max-width: 720px;
+      margin: 0 auto 1.5rem; line-height: 1.65;
+    }
+    .efficiency-pills {
+      display: inline-flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
       margin-bottom: 1rem;
     }
-    .uc-hero p {
-      font-size: 1.02rem; color: var(--text-2); max-width: 720px;
-      margin: 0 auto; line-height: 1.65;
+    .eff-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.78rem; padding: 0.38rem 0.85rem;
+      border-radius: 100px;
+      background: rgba(48,209,88,0.07);
+      border: 1px solid rgba(48,209,88,0.22);
+      color: var(--text-2);
+    }
+    .eff-pill strong { color: var(--good); font-weight: 700; }
+    .eff-pill .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--good);
     }
     .uc-hero .arch-line {
-      margin-top: 1.4rem; font-size: 0.75rem; color: var(--text-3);
-      letter-spacing: 0.02em;
+      margin-top: 1rem; font-size: 0.74rem; color: var(--text-3);
     }
     .uc-hero .arch-line strong { color: var(--text-2); font-weight: 600; }
 
-    /* MARQUEE CARD */
-    .marquee-wrap { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.6rem; }
+    /* ANCHOR — the setup card that frames both marquees */
+    .anchor-wrap { max-width: 1200px; margin: 0 auto; padding: 0.4rem 1.5rem 1.6rem; }
+    .anchor {
+      background: rgba(255,255,255,0.025);
+      border: 1px dashed var(--divider);
+      border-radius: 12px;
+      padding: 1.05rem 1.3rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .anchor__icon {
+      font-size: 1.4rem; flex-shrink: 0;
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(41,151,255,0.1); border: 1px solid rgba(41,151,255,0.28);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .anchor__title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--accent-2); margin-bottom: 0.3rem;
+    }
+    .anchor__body {
+      font-size: 0.88rem; color: var(--text-2); line-height: 1.6;
+    }
+    .anchor__body strong { color: var(--text); font-weight: 600; }
+
+    /* MARQUEES */
+    .marquee-wrap { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.4rem; }
     .marquee {
       background: linear-gradient(145deg, #1c1c1e, #161617);
       border: 1px solid rgba(41,151,255,0.3);
@@ -131,18 +178,23 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--accent), var(--accent-2), transparent);
     }
-    .marquee:hover { border-color: var(--accent); box-shadow: 0 14px 50px rgba(41,151,255,0.16); }
+    .marquee.marquee--vas { border-color: rgba(255,159,10,0.32); }
+    .marquee.marquee--vas::before {
+      background: linear-gradient(90deg, var(--vas-accent), var(--vas-accent-2), transparent);
+    }
+    .marquee:hover { box-shadow: 0 14px 50px rgba(41,151,255,0.16); }
+    .marquee.marquee--vas:hover { box-shadow: 0 14px 50px rgba(255,159,10,0.18); }
 
     .marquee__inner {
       display: grid; grid-template-columns: 1.05fr 1fr;
-      gap: 2rem; padding: 1.6rem 1.8rem;
+      gap: 2rem; padding: 1.55rem 1.8rem;
     }
     @media (max-width: 920px) {
       .marquee__inner { grid-template-columns: 1fr; }
     }
 
     .marquee__head {
-      display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.7rem;
       flex-wrap: wrap;
     }
     .marquee__icon {
@@ -151,6 +203,10 @@
       color: var(--accent-2);
       display: flex; align-items: center; justify-content: center;
       font-size: 1.05rem; flex-shrink: 0;
+    }
+    .marquee--vas .marquee__icon {
+      background: rgba(255,159,10,0.12); border-color: rgba(255,159,10,0.32);
+      color: var(--vas-accent-2);
     }
     .marquee__title {
       font-size: 1.18rem; font-weight: 700; letter-spacing: -0.01em;
@@ -161,11 +217,13 @@
     }
     .pill-status--live   { background: rgba(48,209,88,0.13); color: #6ee7b7; border: 1px solid rgba(48,209,88,0.3); }
     .pill-status--pilot  { background: rgba(255,159,10,0.12); color: #fcd34d; border: 1px solid rgba(255,159,10,0.3); }
-    .pill-status--planned{ background: rgba(100,116,139,0.14); color: var(--text-2); border: 1px solid rgba(100,116,139,0.28); }
     .pill-marquee {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em;
       padding: 0.18rem 0.55rem; border-radius: 100px; text-transform: uppercase;
       background: rgba(41,151,255,0.12); color: var(--accent-2); border: 1px solid rgba(41,151,255,0.28);
+    }
+    .marquee--vas .pill-marquee {
+      background: rgba(255,159,10,0.12); color: var(--vas-accent-2); border-color: rgba(255,159,10,0.28);
     }
 
     .uc-row {
@@ -181,6 +239,7 @@
     }
     .uc-row__label--today { color: var(--text-3); }
     .uc-row__label--ai    { color: var(--accent-2); }
+    .marquee--vas .uc-row__label--ai { color: var(--vas-accent-2); }
     .uc-row__body { font-size: 0.88rem; color: var(--text-2); line-height: 1.55; }
     .uc-row__body strong { color: var(--text); font-weight: 600; }
 
@@ -223,6 +282,12 @@
     }
     .run-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(41,151,255,0.42); }
     .run-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .marquee--vas .run-btn {
+      background: linear-gradient(135deg, var(--vas-accent), var(--vas-accent-2));
+      box-shadow: 0 4px 14px rgba(255,159,10,0.32);
+      color: #1d1d1f;
+    }
+    .marquee--vas .run-btn:hover { box-shadow: 0 8px 22px rgba(255,159,10,0.42); }
     .run-btn[data-running="true"] {
       background: rgba(255,255,255,0.06); color: var(--text-2); border: 1px solid var(--divider);
       box-shadow: none;
@@ -232,7 +297,7 @@
     .storyboard {
       grid-column: 1 / -1;
       margin-top: 0.5rem;
-      padding-top: 1.5rem;
+      padding-top: 1.4rem;
       border-top: 1px solid var(--divider);
       display: none;
     }
@@ -247,6 +312,7 @@
       text-transform: uppercase; color: var(--text-2);
     }
     .storyboard__title strong { color: var(--accent-2); font-weight: 800; }
+    .marquee--vas .storyboard__title strong { color: var(--vas-accent-2); }
     .storyboard__sub { font-size: 0.78rem; color: var(--text-3); }
 
     .storyboard__grid {
@@ -263,7 +329,7 @@
       padding: 0.95rem 1rem 0.9rem;
       opacity: 0; transform: translateY(10px);
       transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, background 0.3s;
-      min-height: 145px;
+      min-height: 168px;
       display: flex; flex-direction: column; gap: 0.45rem;
     }
     .stage.is-revealed { opacity: 1; transform: translateY(0); }
@@ -271,6 +337,11 @@
       border-color: var(--accent);
       background: rgba(41,151,255,0.06);
       box-shadow: 0 6px 24px rgba(41,151,255,0.14);
+    }
+    .marquee--vas .stage.is-active {
+      border-color: var(--vas-accent);
+      background: rgba(255,159,10,0.06);
+      box-shadow: 0 6px 24px rgba(255,159,10,0.16);
     }
     .stage__num {
       position: absolute; top: -10px; left: 14px;
@@ -280,11 +351,16 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 0.68rem; font-weight: 800;
     }
+    .marquee--vas .stage__num {
+      border-color: var(--vas-accent);
+      color: var(--vas-accent-2);
+    }
     .stage__icon { font-size: 1.05rem; }
     .stage__title {
       font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em;
       text-transform: uppercase; color: var(--accent-2);
     }
+    .marquee--vas .stage__title { color: var(--vas-accent-2); }
     .stage__head {
       font-size: 0.92rem; font-weight: 700; color: var(--text);
       letter-spacing: -0.01em; line-height: 1.3;
@@ -307,38 +383,109 @@
     .arrow-between.is-revealed { opacity: 0.55; }
     @media (max-width: 920px) { .arrow-between { display: none; } }
 
-    /* GRID OF 6 */
-    .uc-grid-wrap { max-width: 1200px; margin: 0 auto; padding: 0.6rem 1.5rem 4rem; }
-    .uc-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 1rem;
+    /* COLLECTION SKU CHIPS — used inside stages */
+    .sku-row {
+      display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.35rem 0 0.1rem;
     }
-    .uc-card {
+    .sku {
+      font-size: 0.58rem; font-weight: 700; padding: 0.15rem 0.42rem;
+      border-radius: 4px; letter-spacing: 0.02em;
+      background: rgba(255,255,255,0.06);
+      color: var(--text-2);
+      border: 1px solid var(--divider);
+    }
+    .sku.sku--ok    { background: rgba(48,209,88,0.13);  color: #6ee7b7; border-color: rgba(48,209,88,0.3); }
+    .sku.sku--short { background: rgba(255,159,10,0.13); color: #fcd34d; border-color: rgba(255,159,10,0.32); }
+    .sku.sku--fixed { background: rgba(41,151,255,0.13); color: var(--accent-2); border-color: rgba(41,151,255,0.32); }
+
+    /* AUDIT LOG (for VAS marquee) */
+    .audit-log {
+      grid-column: 1 / -1;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--divider);
+      border-left: 3px solid var(--good);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      font-size: 0.72rem;
+      color: var(--text-2);
+      opacity: 0; transition: opacity 0.55s ease;
+    }
+    .audit-log.is-revealed { opacity: 1; }
+    .audit-log__head {
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--good); margin-bottom: 0.55rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .audit-log__head::before { content: '🛡'; font-size: 0.95rem; }
+    .audit-log__row {
+      display: grid; grid-template-columns: 1.1fr 1fr 0.7fr 0.8fr;
+      gap: 0.6rem; padding: 0.18rem 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+    .audit-log__row:last-of-type { border-bottom: none; }
+    .audit-log__row.audit-log__row--head {
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      font-size: 0.6rem; color: var(--text-3); font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase; padding-bottom: 0.4rem;
+    }
+    .audit-log__verdict {
+      font-weight: 700;
+    }
+    .audit-log__verdict--new        { color: #6ee7b7; }
+    .audit-log__verdict--updated    { color: var(--accent-2); }
+    .audit-log__verdict--recalc     { color: #fcd34d; }
+    .audit-log__footer {
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      font-size: 0.74rem; color: var(--text);
+      margin-top: 0.65rem; padding-top: 0.55rem;
+      border-top: 1px solid var(--divider);
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .audit-log__footer strong { color: var(--good); }
+
+    /* COMPACT "MORE" STRIP */
+    .more-wrap { max-width: 1200px; margin: 0 auto; padding: 1.6rem 1.5rem 4rem; }
+    .more-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 0.85rem; gap: 1rem; flex-wrap: wrap;
+    }
+    .more-head h2 {
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      letter-spacing: -0.005em;
+    }
+    .more-head p { font-size: 0.78rem; color: var(--text-3); }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.6rem;
+    }
+    .mini-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px; padding: 1.3rem 1.35rem 1.4rem;
-      display: flex; flex-direction: column; gap: 0.65rem;
-      transition: border-color 0.24s, transform 0.24s, box-shadow 0.24s;
+      border-radius: 12px; padding: 0.85rem 1rem;
+      display: flex; flex-direction: column; gap: 0.42rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .uc-card:hover { border-color: var(--card-border-h); transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.28); }
-    .uc-card__head {
-      display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.1rem;
-    }
-    .uc-card__icon {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: rgba(41,151,255,0.12); border: 1px solid rgba(41,151,255,0.28);
-      color: var(--accent-2);
+    .mini-card:hover { border-color: var(--card-border-h); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+    .mini-card__head { display: flex; align-items: center; gap: 0.5rem; }
+    .mini-card__icon {
+      width: 26px; height: 26px; border-radius: 6px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--divider);
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem; flex-shrink: 0;
+      font-size: 0.85rem; flex-shrink: 0;
     }
-    .uc-card__title {
-      font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
+    .mini-card__title { font-size: 0.83rem; font-weight: 700; flex: 1; line-height: 1.25; }
+    .mini-card__pain { font-size: 0.74rem; color: var(--text-2); line-height: 1.5; }
+    .mini-card__impact {
+      font-size: 0.7rem; color: var(--good); font-weight: 600;
+      display: inline-flex; align-items: center; gap: 0.35rem;
     }
-    .uc-card .pill-status { margin-left: auto; }
-    .uc-card .uc-row { padding: 0.4rem 0; }
-    .uc-card .uc-row__label { width: 48px; font-size: 0.6rem; }
-    .uc-card .uc-row__body { font-size: 0.81rem; }
-    .uc-card .impact-metric { font-size: 0.74rem; padding: 0.32rem 0.6rem; margin-top: 0.5rem; }
+    .mini-card__impact::before { content: '↑'; }
 
     /* FOOTER */
     .page-footer {
@@ -377,10 +524,18 @@
     </button>
   </header>
 
+  <!-- HERO -->
   <section class="uc-hero">
-    <span class="uc-eyebrow">Commercial Experience Agent · 7 AI Capabilities</span>
-    <h1>Seven places we put AI to work in wholesale OTC.</h1>
-    <p>Each capability sits across the SAP S/4HANA + aATP core, the SAP BTP integration fabric, and the Microsoft agentic edge. Every one is measurable, governed, and runs inside autonomous-action policy guardrails.</p>
+    <span class="uc-eyebrow">Commercial Experience Agent · Two Hero Capabilities</span>
+    <h1>Two AI moments. One collection. <em>Hours&nbsp;→&nbsp;minutes.</em></h1>
+    <p class="lead">Both moments anchor on the same retailer pre-book — a 6-SKU spring capsule headed for a 412-store sporting-goods chain — so the room follows one collection through both AI capabilities, end to end.</p>
+
+    <div class="efficiency-pills">
+      <span class="eff-pill"><span class="dot"></span>Issue resolution: <strong>hours&nbsp;→&nbsp;minutes</strong></span>
+      <span class="eff-pill"><span class="dot"></span>Audit trail: <strong>every change logged</strong></span>
+      <span class="eff-pill"><span class="dot"></span>Silent failures: <strong>zero</strong></span>
+    </div>
+
     <div class="arch-line">
       <strong>Lean Core:</strong> SAP S/4HANA + aATP &nbsp;·&nbsp;
       <strong>Hybrid Edge:</strong> SAP BTP / BDC &nbsp;·&nbsp;
@@ -388,7 +543,20 @@
     </div>
   </section>
 
-  <!-- MARQUEE: STOCK PROTECTION -->
+  <!-- ANCHOR -->
+  <div class="anchor-wrap">
+    <div class="anchor">
+      <div class="anchor__icon">🎯</div>
+      <div>
+        <div class="anchor__title">The setup · One collection, two AI moments</div>
+        <div class="anchor__body">
+          <strong>Coastline Athletics</strong> — a generic 412-store national sporting-goods chain — places a Spring '26 pre-book PO for the <strong>Summit Trail Capsule</strong>: a coordinated 6-SKU collection (jacket, pant, two tee colours, headband, gloves) that has to land complete on a fixed in-store launch date of <strong>April 12</strong>. Collection-master rules in S/4 say all six SKUs are mandatory inclusions for the capsule drop — partial = no drop.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARQUEE 1: STOCK PROTECTION -->
   <div class="marquee-wrap">
     <article class="marquee">
       <div class="marquee__inner">
@@ -397,30 +565,31 @@
           <div class="marquee__head">
             <div class="marquee__icon">🔍</div>
             <div class="marquee__title">Stock Protection Transparency</div>
-            <span class="pill-marquee">Hero capability</span>
+            <span class="pill-marquee">AI Moment 1 of 2</span>
             <span class="pill-status pill-status--live">Live</span>
           </div>
 
           <div class="uc-row">
             <div class="uc-row__label uc-row__label--today">Today</div>
             <div class="uc-row__body">
-              An order comes back <strong>partial-confirmed</strong>. Nobody knows why. Ops emails the DC, the DC emails planning, planning emails merch. Days lost. Retailer waits. Sometimes the missing supply is sitting unallocated in another channel — but the gap is invisible.
+              For a curated collection drop, when even <strong>one SKU is short</strong> the buyer's whole capsule lands incomplete — and partial drops are scorecard penalties at a Tier-1 retailer. Today, ops finds out from the warehouse the day of pick-pack: emails fly, the buyer gets called, the capsule slips. Sometimes the missing supply is sitting unallocated <strong>in another channel</strong> — but the gap is invisible.
             </div>
           </div>
           <div class="uc-row">
             <div class="uc-row__label uc-row__label--ai">With AI</div>
             <div class="uc-row__body">
-              The agent reads aATP's PAC result, identifies <strong>exactly</strong> which allocation drift caused the shortfall, and proposes an inventory swap from another channel — with one-click commit. Wholesale tier integrity is preserved.
+              The agent reads aATP's PAC result <strong>across all 6 SKUs in the collection</strong>, identifies the allocation drift, cross-references DTC channel buffers for unallocated supply, and proposes a <strong>channel-buffer rebalance</strong> that ships the capsule complete. <strong>Every rebalance posts to the immutable audit ledger</strong> — no opaque inventory moves.
             </div>
           </div>
 
           <div class="impact-metric">
-            <span class="arrow">↑</span>
-            <span><strong>78% of partial-confirms</strong> auto-resolved · 4 hours → 4 minutes mean time to resolution</span>
+            <span class="arrow">↓</span>
+            <span><strong>Hours of ops escalation → 4 minutes.</strong> Capsule ships complete · scorecard preserved.</span>
           </div>
 
           <div class="tech-chips">
             <span class="chip chip--s4">SAP aATP</span>
+            <span class="chip chip--s4">Collection Master</span>
             <span class="chip chip--fab">MS Fabric</span>
             <span class="chip chip--d365">Dynamics 365</span>
             <span class="chip chip--co">Copilot</span>
@@ -429,9 +598,9 @@
 
         <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.9rem;">
           <p style="font-size:0.78rem;color:var(--text-3);text-align:center;line-height:1.55;max-width:280px;">
-            See the four-step flow the agent runs every time a partial-confirm hits — from signal to autonomous swap.
+            See the four-step flow the agent runs every time a collection comes back partially confirmed — from signal to autonomous channel rebalance.
           </p>
-          <button class="run-btn" id="runBtn" onclick="runStoryboard()">
+          <button class="run-btn" id="runBtn-stock" onclick="runStoryboard('storyboard-stock','runBtn-stock')">
             ▶ See it in action
           </button>
           <p style="font-size:0.7rem;color:var(--text-3);text-align:center;font-style:italic;opacity:0.7;">
@@ -441,59 +610,69 @@
 
       </div>
 
-      <!-- STORYBOARD -->
-      <div class="storyboard" id="storyboard" style="padding: 0 1.8rem 1.6rem;">
+      <!-- STORYBOARD: STOCK PROTECTION -->
+      <div class="storyboard" id="storyboard-stock" style="padding: 0 1.8rem 1.6rem;">
         <div class="storyboard__head">
-          <div class="storyboard__title"><strong>Stock Protection · Live trace</strong> &nbsp;·&nbsp; PO-66019 · Athletic Warehouse · 1,200 units · TF-RUN-L2</div>
-          <div class="storyboard__sub">Wednesday, 9:14 AM · while order entry is at lunch</div>
+          <div class="storyboard__title"><strong>Stock Protection · Live trace</strong> &nbsp;·&nbsp; PO-67901 · Coastline Athletics · Summit Trail Capsule (6 SKUs)</div>
+          <div class="storyboard__sub">Wednesday, 9:14 AM · 38 days to launch</div>
         </div>
 
         <div class="storyboard__grid">
 
-          <div class="stage" id="stage-1">
+          <div class="stage" id="stock-stage-1">
             <div class="stage__num">1</div>
             <div style="display:flex;align-items:center;gap:0.5rem;">
               <span class="stage__icon">📡</span>
               <span class="stage__title">Signal</span>
             </div>
-            <div class="stage__head">PAC returned partial-confirmed.</div>
+            <div class="stage__head">Capsule came back 4 of 6 confirmed.</div>
             <div class="stage__body">
-              Athletic Warehouse PO-66019 for 1,200 units of <strong>TF-RUN-L2</strong> just came back from S/4: <strong>800 confirmed, 400 short</strong>. Carrier MABD is in 9 days.
+              aATP PAC returned <strong>only 4 of the 6 collection SKUs fully confirmed</strong>. The trail jacket and one of the tees are short.
+            </div>
+            <div class="sku-row">
+              <span class="sku sku--ok">JKT-TRL-08</span>
+              <span class="sku sku--ok">PNT-TRL-12</span>
+              <span class="sku sku--short">TEE-TRL-04</span>
+              <span class="sku sku--ok">TEE-TRL-05</span>
+              <span class="sku sku--ok">HBD-TRL-02</span>
+              <span class="sku sku--short">GLV-TRL-09</span>
             </div>
             <div class="stage__systems">
               <span class="chip chip--s4">aATP PAC</span>
+              <span class="chip chip--s4">Collection Master</span>
             </div>
           </div>
 
-          <div class="arrow-between" id="arrow-1">→</div>
+          <div class="arrow-between" id="stock-arrow-1">→</div>
 
-          <div class="stage" id="stage-2">
+          <div class="stage" id="stock-stage-2">
             <div class="stage__num">2</div>
             <div style="display:flex;align-items:center;gap:0.5rem;">
               <span class="stage__icon">🧠</span>
               <span class="stage__title">Reason</span>
             </div>
-            <div class="stage__head">Allocation drift on the core SKU.</div>
+            <div class="stage__head">Two SKUs short. Capsule rules say no partial drop.</div>
             <div class="stage__body">
-              aATP traces the gap to <strong>Product Allocation</strong>: wholesale Tier-1 buffer is intact, but cross-channel demand from DTC ate into the shared pool. <strong>400 units of TF-RUN-L2</strong> sit unallocated in DTC channel buffer MD20-4.
+              Collection-master flags <strong>all 6 SKUs mandatory</strong> for the capsule. aATP traces both shortages to DTC cross-channel demand. <strong>1,800 units of TEE-TRL-04</strong> + <strong>620 units of GLV-TRL-09</strong> sit unallocated in DTC buffer MD20-4.
             </div>
             <div class="stage__systems">
               <span class="chip chip--s4">aATP Allocation</span>
               <span class="chip chip--fab">MS Fabric</span>
+              <span class="chip chip--d365">Launch Window</span>
             </div>
           </div>
 
-          <div class="arrow-between" id="arrow-2">→</div>
+          <div class="arrow-between" id="stock-arrow-2">→</div>
 
-          <div class="stage" id="stage-3">
+          <div class="stage" id="stock-stage-3">
             <div class="stage__num">3</div>
             <div style="display:flex;align-items:center;gap:0.5rem;">
               <span class="stage__icon">💡</span>
               <span class="stage__title">Recommend</span>
             </div>
-            <div class="stage__head">Channel swap, fully within policy.</div>
+            <div class="stage__head">Channel rebalance — both SKUs covered.</div>
             <div class="stage__body">
-              Copilot proposes swapping <strong>400 units from DTC buffer MD20-4</strong> to the wholesale allocation. DTC sell-through forecast unaffected (90 days of cover remaining). Within autonomous-action policy.
+              Copilot proposes a <strong>two-SKU channel rebalance from DTC MD20-4</strong>. DTC sell-through cover stays at 78 days (above 60-day threshold). Within autonomous-action policy. Capsule launch protected.
             </div>
             <div class="stage__systems">
               <span class="chip chip--co">Copilot</span>
@@ -501,17 +680,25 @@
             </div>
           </div>
 
-          <div class="arrow-between" id="arrow-3">→</div>
+          <div class="arrow-between" id="stock-arrow-3">→</div>
 
-          <div class="stage" id="stage-4">
+          <div class="stage" id="stock-stage-4">
             <div class="stage__num">4</div>
             <div style="display:flex;align-items:center;gap:0.5rem;">
               <span class="stage__icon">✅</span>
               <span class="stage__title">Act</span>
             </div>
-            <div class="stage__head">Swap committed. PO fully confirmed.</div>
+            <div class="stage__head">Capsule fully confirmed · 6 of 6.</div>
             <div class="stage__body">
-              aATP commits the channel swap. <strong>PO-66019 is now 1,200 of 1,200 confirmed</strong>. DTC buffer rebalanced. Athletic Warehouse buyer notified via Outlook. <strong>Zero ops touches.</strong>
+              aATP commits the channel swap. Both shortages resolved. <strong>PO-67901 confirmed in full.</strong>
+            </div>
+            <div class="sku-row">
+              <span class="sku sku--ok">JKT-TRL-08</span>
+              <span class="sku sku--ok">PNT-TRL-12</span>
+              <span class="sku sku--fixed">TEE-TRL-04</span>
+              <span class="sku sku--ok">TEE-TRL-05</span>
+              <span class="sku sku--ok">HBD-TRL-02</span>
+              <span class="sku sku--fixed">GLV-TRL-09</span>
             </div>
             <div class="stage__systems">
               <span class="chip chip--s4">aATP</span>
@@ -522,179 +709,267 @@
 
         </div>
 
-        <div style="text-align:center;margin-top:1.2rem;font-size:0.76rem;color:var(--text-3);">
-          End-to-end in <strong style="color:var(--good);">52 seconds</strong> · Athletic Warehouse never knew the partial-confirm happened.
+        <div style="text-align:center;margin-top:1.1rem;font-size:0.76rem;color:var(--text-3);">
+          End-to-end in <strong style="color:var(--good);">52 seconds</strong> · channel rebalance posted to audit ledger · Coastline never knew there was a partial-confirm.
         </div>
       </div>
 
     </article>
   </div>
 
-  <!-- 6-CARD GRID -->
-  <div class="uc-grid-wrap">
-    <div class="uc-grid">
+  <!-- MARQUEE 2: VAS REDETERMINATION -->
+  <div class="marquee-wrap">
+    <article class="marquee marquee--vas">
+      <div class="marquee__inner">
 
-      <!-- 1. Prepack -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">📦</div>
-          <div class="uc-card__title">Prepack Auto-Selection</div>
+        <div>
+          <div class="marquee__head">
+            <div class="marquee__icon">🏷️</div>
+            <div class="marquee__title">VAS Redetermination</div>
+            <span class="pill-marquee">AI Moment 2 of 2</span>
+            <span class="pill-status pill-status--pilot">Pilot</span>
+          </div>
+
+          <div class="uc-row">
+            <div class="uc-row__label uc-row__label--today">Today</div>
+            <div class="uc-row__body">
+              Three days later the buyer revises the same capsule PO — adds 200 units, splits across <strong>two destinations</strong> (NJ DC + Atlanta DC). That single change should cascade into <strong>14 condition-record updates</strong> across the 6 SKUs at both DCs: prepack ratio recalc, destination-specific hangtags, per-state pricing labels. Today most of those silently break — the order ships, the retailer flags the missing tickets, chargebacks land 6 weeks later. Margin leak nobody saw.
+            </div>
+          </div>
+          <div class="uc-row">
+            <div class="uc-row__label uc-row__label--ai">With AI</div>
+            <div class="uc-row__body">
+              The agent re-evaluates <strong>every</strong> VAS condition record the moment quantities, destinations, or prepacks change — applies the right ones across the 6 SKUs at both DCs, <strong>logs each change with reason code to the audit ledger</strong>, posts a compliance summary to Power BI / Teams. <strong>Zero silent failures. Zero margin leak.</strong>
+            </div>
+          </div>
+
+          <div class="impact-metric">
+            <span class="arrow">↓</span>
+            <span><strong>Hours of cross-team calls → 90 seconds.</strong> 95% margin preserved · 0 silent failures.</span>
+          </div>
+
+          <div class="tech-chips">
+            <span class="chip chip--s4">SAP S/4HANA</span>
+            <span class="chip chip--s4">VAS Conditions</span>
+            <span class="chip chip--co">Copilot</span>
+            <span class="chip chip--pa">Power Automate</span>
+            <span class="chip chip--d365">Compliance Audit</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.9rem;">
+          <p style="font-size:0.78rem;color:var(--text-3);text-align:center;line-height:1.55;max-width:280px;">
+            See how a single buyer revision triggers 14 governed condition-record updates — every one logged, no silent failures.
+          </p>
+          <button class="run-btn" id="runBtn-vas" onclick="runStoryboard('storyboard-vas','runBtn-vas')">
+            ▶ See it in action
+          </button>
+          <p style="font-size:0.7rem;color:var(--text-3);text-align:center;font-style:italic;opacity:0.7;">
+            ~12 second storyboard · ends with the audit ledger
+          </p>
+        </div>
+
+      </div>
+
+      <!-- STORYBOARD: VAS -->
+      <div class="storyboard" id="storyboard-vas" style="padding: 0 1.8rem 1.6rem;">
+        <div class="storyboard__head">
+          <div class="storyboard__title"><strong>VAS Redetermination · Live trace</strong> &nbsp;·&nbsp; PO-67901 revised · Coastline Athletics · Summit Trail Capsule (6 SKUs × 2 DCs)</div>
+          <div class="storyboard__sub">Saturday, 11:42 AM · buyer revision via EDI 860</div>
+        </div>
+
+        <div class="storyboard__grid">
+
+          <div class="stage" id="vas-stage-1">
+            <div class="stage__num">1</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="stage__icon">📡</span>
+              <span class="stage__title">Signal</span>
+            </div>
+            <div class="stage__head">Buyer revised the capsule PO.</div>
+            <div class="stage__body">
+              Coastline buyer pushed an <strong>EDI 860 change order</strong>: <strong>+200 units</strong> on TEE-TRL-04, <strong>destination split</strong> 60/40 between <strong>Edison DC (NJ)</strong> and <strong>Forest Park DC (GA)</strong>. Three triggers fire: <strong>qty</strong>, <strong>destination</strong>, <strong>prepack</strong>.
+            </div>
+            <div class="stage__systems">
+              <span class="chip chip--btp">EDI 860</span>
+              <span class="chip chip--s4">S/4 Order Mgmt</span>
+            </div>
+          </div>
+
+          <div class="arrow-between" id="vas-arrow-1">→</div>
+
+          <div class="stage" id="vas-stage-2">
+            <div class="stage__num">2</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="stage__icon">🧠</span>
+              <span class="stage__title">Reason</span>
+            </div>
+            <div class="stage__head">14 VAS rules need re-determination.</div>
+            <div class="stage__body">
+              The change cascades across the capsule: <strong>destination-specific hangtags</strong> (NE vs. SE marketing), <strong>per-state pricing labels</strong> (NJ vs. GA), <strong>prepack ratio recalc</strong> at both DCs. Today, condition records would be left stale on most SKUs — silent failure.
+            </div>
+            <div class="stage__systems">
+              <span class="chip chip--s4">VAS Conditions</span>
+              <span class="chip chip--fab">MS Fabric</span>
+            </div>
+          </div>
+
+          <div class="arrow-between" id="vas-arrow-2">→</div>
+
+          <div class="stage" id="vas-stage-3">
+            <div class="stage__num">3</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="stage__icon">💡</span>
+              <span class="stage__title">Recommend</span>
+            </div>
+            <div class="stage__head">Apply the right rule to the right SKU at the right DC.</div>
+            <div class="stage__body">
+              Copilot maps <strong>every condition record across 6 SKUs × 2 DCs</strong>: the right hangtag for the right region, the right state pricing label, the recalculated prepack ratio. <strong>No human to chase down the rule book.</strong>
+            </div>
+            <div class="stage__systems">
+              <span class="chip chip--co">Copilot</span>
+              <span class="chip chip--mdg">MDG RFM</span>
+            </div>
+          </div>
+
+          <div class="arrow-between" id="vas-arrow-3">→</div>
+
+          <div class="stage" id="vas-stage-4">
+            <div class="stage__num">4</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="stage__icon">✅</span>
+              <span class="stage__title">Act + Audit</span>
+            </div>
+            <div class="stage__head">14 changes applied · all logged.</div>
+            <div class="stage__body">
+              Power Automate writes the 14 condition-record changes back to S/4. <strong>Every one carries a reason code to the immutable audit ledger.</strong> Compliance card streams to Power BI + Teams.
+            </div>
+            <div class="stage__systems">
+              <span class="chip chip--pa">Power Automate</span>
+              <span class="chip chip--s4">S/4 VAS</span>
+              <span class="chip chip--d365">Compliance</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AUDIT LOG -->
+        <div class="audit-log" id="vas-audit">
+          <div class="audit-log__head">Audit Ledger · 14 condition-record changes · PO-67901</div>
+          <div class="audit-log__row audit-log__row--head">
+            <span>Condition</span>
+            <span>Scope</span>
+            <span>Reason code</span>
+            <span>Verdict</span>
+          </div>
+          <div class="audit-log__row">
+            <span>PRICE_TICKET_NJ</span><span>6 SKUs · Edison DC</span><span>VAS_DEST_SPLIT</span>
+            <span class="audit-log__verdict audit-log__verdict--new">NEW</span>
+          </div>
+          <div class="audit-log__row">
+            <span>PRICE_TICKET_GA</span><span>6 SKUs · Forest Park</span><span>VAS_DEST_SPLIT</span>
+            <span class="audit-log__verdict audit-log__verdict--new">NEW</span>
+          </div>
+          <div class="audit-log__row">
+            <span>HANGTAG_NORTHEAST</span><span>6 SKUs · Edison DC</span><span>VAS_REGION_TAG</span>
+            <span class="audit-log__verdict audit-log__verdict--updated">UPDATED</span>
+          </div>
+          <div class="audit-log__row">
+            <span>HANGTAG_SOUTHEAST</span><span>6 SKUs · Forest Park</span><span>VAS_REGION_TAG</span>
+            <span class="audit-log__verdict audit-log__verdict--new">NEW</span>
+          </div>
+          <div class="audit-log__row">
+            <span>PREPACK_RATIO</span><span>6 SKUs · both DCs</span><span>VAS_QTY_DELTA</span>
+            <span class="audit-log__verdict audit-log__verdict--recalc">RECALCULATED</span>
+          </div>
+          <div class="audit-log__row">
+            <span>POLY_BAG_SPEC</span><span>2 SKUs · Forest Park</span><span>VAS_DEST_RULE</span>
+            <span class="audit-log__verdict audit-log__verdict--updated">UPDATED</span>
+          </div>
+          <div class="audit-log__row">
+            <span>SECURITY_TAG_EAS</span><span>1 SKU · Edison DC</span><span>VAS_RETAILER_RULE</span>
+            <span class="audit-log__verdict audit-log__verdict--new">NEW</span>
+          </div>
+          <div class="audit-log__row">
+            <span style="color:var(--text-3);">+ 7 more rule re-determinations &hellip;</span>
+            <span></span><span></span><span></span>
+          </div>
+          <div class="audit-log__footer">
+            <span><strong>14</strong> condition records updated</span>
+            <span><strong>0</strong> silent failures</span>
+            <span><strong>100%</strong> audit-trailed · reason codes attached</span>
+            <span style="margin-left:auto;color:var(--text-3);">Streaming to Power BI Compliance &nbsp;·&nbsp; Teams #vas-audit</span>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-top:1.1rem;font-size:0.76rem;color:var(--text-3);">
+          End-to-end in <strong style="color:var(--good);">87 seconds</strong> · zero margin leak · Coastline gets the right tickets at the right DC, every box.
+        </div>
+      </div>
+
+    </article>
+  </div>
+
+  <!-- COMPACT "MORE AI CAPABILITIES" STRIP -->
+  <section class="more-wrap">
+    <div class="more-head">
+      <h2>More AI capabilities behind these two</h2>
+      <p>Five more in production at Meridian — supporting the two heroes above.</p>
+    </div>
+    <div class="mini-grid">
+
+      <div class="mini-card">
+        <div class="mini-card__head">
+          <div class="mini-card__icon">📦</div>
+          <div class="mini-card__title">Prepack Auto-Selection</div>
           <span class="pill-status pill-status--live">Live</span>
         </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">Order entry team manually picks prepack ratios per retailer. ~5 minutes per order. Errors carry through to the warehouse and the retailer scorecard.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent picks the right prepack from <strong>retailer Ratio ID + order history</strong>. Order entry confirms in one click. Duplicate-entry risk vanishes.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↓</span>
-          <span><strong>5 min → 30 sec</strong> entry · <strong>&lt;1%</strong> prepack errors</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--s4">S/4HANA</span>
-          <span class="chip chip--mdg">MDG RFM</span>
-          <span class="chip chip--co">Copilot</span>
-        </div>
-      </article>
+        <div class="mini-card__pain">Picks the right prepack ratio per retailer, no manual lookup. Eliminates duplicate entry.</div>
+        <div class="mini-card__impact">5 min → 30 sec entry</div>
+      </div>
 
-      <!-- 2. Sales Order Completion -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">📝</div>
-          <div class="uc-card__title">Sales-Order Completion</div>
+      <div class="mini-card">
+        <div class="mini-card__head">
+          <div class="mini-card__icon">📝</div>
+          <div class="mini-card__title">Sales-Order Completion</div>
           <span class="pill-status pill-status--live">Live</span>
         </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">Incoming orders arrive incomplete: missing payment terms, ship-from, customer-master gaps. Order desk emails account managers for fixes — bottleneck.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent fills missing fields from <strong>customer master + retailer history + Dynamics context</strong>. Flags only the few it cannot resolve.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↓</span>
-          <span><strong>~80%</strong> manual rekey eliminated · cleaner master data</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--s4">S/4HANA</span>
-          <span class="chip chip--mdg">MDG RFM</span>
-          <span class="chip chip--d365">Dynamics 365</span>
-          <span class="chip chip--co">Copilot</span>
-        </div>
-      </article>
+        <div class="mini-card__pain">Fills missing fields (terms, ship-from, customer master gaps) from history. Cleaner master data.</div>
+        <div class="mini-card__impact">~80% rekey eliminated</div>
+      </div>
 
-      <!-- 3. VAS Re-determination -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">🏷️</div>
-          <div class="uc-card__title">VAS Re-determination</div>
+      <div class="mini-card">
+        <div class="mini-card__head">
+          <div class="mini-card__icon">💲</div>
+          <div class="mini-card__title">AI Pricing Data Prep</div>
+          <span class="pill-status pill-status--live">Live</span>
+        </div>
+        <div class="mini-card__pain">Parses Excel / email pricing changes. Flags duplicate condition keys, overlapping validities, missing combos.</div>
+        <div class="mini-card__impact">~80% manual labour saved</div>
+      </div>
+
+      <div class="mini-card">
+        <div class="mini-card__head">
+          <div class="mini-card__icon">🔁</div>
+          <div class="mini-card__title">TPO/PTO Change Feasibility</div>
           <span class="pill-status pill-status--pilot">Pilot</span>
         </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">When orders change (qty, ship-to, prepack), VAS rules — price ticketing, hangtags, special pack — break silently. Margin leaks; retailer flags missing tickets and chargebacks land.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent re-evaluates VAS condition records every time the order changes and applies the right ones automatically. Audit trail preserved.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↑</span>
-          <span><strong>95%</strong> margin preserved on order modifications</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--s4">S/4HANA</span>
-          <span class="chip chip--co">Copilot</span>
-          <span class="chip chip--pa">Power Automate</span>
-        </div>
-      </article>
+        <div class="mini-card__pain">Reads downstream state (in-transit, GI posted, ASN sent). Recommends convert / split / divert / cancel-replace.</div>
+        <div class="mini-card__impact">65% auto-resolved</div>
+      </div>
 
-      <!-- 4. Pricing Data Prep -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">💲</div>
-          <div class="uc-card__title">AI Pricing Data Prep</div>
+      <div class="mini-card">
+        <div class="mini-card__head">
+          <div class="mini-card__icon">📷</div>
+          <div class="mini-card__title">POD Capture → Auto-Billing</div>
           <span class="pill-status pill-status--live">Live</span>
         </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">Pricing teams ingest spreadsheets and email attachments, manually de-duplicate condition keys, find overlapping validity windows, hunt missing customer/material combinations. Days per cycle.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent parses Excel/CSV/email, flags <strong>duplicate condition keys</strong>, <strong>overlapping validities</strong>, and <strong>missing combos</strong>, presents a clean diff for approval.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↓</span>
-          <span><strong>~80%</strong> of manual pricing-maintenance work removed</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--fab">MS Fabric</span>
-          <span class="chip chip--co">Copilot</span>
-          <span class="chip chip--s4">S/4HANA</span>
-        </div>
-      </article>
-
-      <!-- 5. TPO/PTO Change Feasibility -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">🔁</div>
-          <div class="uc-card__title">TPO/PTO Change Feasibility</div>
-          <span class="pill-status pill-status--pilot">Pilot</span>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">Retailer asks to change/cancel a TPO/PTO order. Coordinator manually checks downstream state — in transit? GI posted? ASN sent? — calls warehouse, calls carrier. Bad calls cost money.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent reads downstream state and recommends the optimal action: <strong>convert · split · substitute · divert · cancel-and-replace · return-to-vendor</strong>.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↑</span>
-          <span><strong>65%</strong> of changes resolved within autonomous policy · ~70% lower bad-call cost</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--s4">aATP</span>
-          <span class="chip chip--pa">Power Automate</span>
-          <span class="chip chip--d365">Dynamics 365</span>
-          <span class="chip chip--ariba">Ariba</span>
-        </div>
-      </article>
-
-      <!-- 6. POD Capture -->
-      <article class="uc-card">
-        <div class="uc-card__head">
-          <div class="uc-card__icon">📷</div>
-          <div class="uc-card__title">POD Capture → Auto-Billing</div>
-          <span class="pill-status pill-status--live">Live</span>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--today">Today</div>
-          <div class="uc-row__body">AR clerks manually attach POD scans/photos to invoices. Slow billing release. Cash sits. DSO drags.</div>
-        </div>
-        <div class="uc-row">
-          <div class="uc-row__label uc-row__label--ai">With AI</div>
-          <div class="uc-row__body">Agent OCRs PODs (<strong>scan · photo · PDF</strong>), extracts the delivery reference, attaches to delivery/invoice, and triggers the next step — <strong>release billing, close shipment</strong>.</div>
-        </div>
-        <div class="impact-metric">
-          <span class="arrow">↓</span>
-          <span><strong>1.6 days</strong> off invoice-to-cash · AR labor freed</span>
-        </div>
-        <div class="tech-chips">
-          <span class="chip chip--fab">MS Fabric</span>
-          <span class="chip chip--pa">Power Automate</span>
-          <span class="chip chip--s4">S/4HANA</span>
-          <span class="chip chip--d365">Dynamics 365</span>
-        </div>
-      </article>
+        <div class="mini-card__pain">OCRs PODs (scan / photo / PDF), attaches to invoice, releases billing. Compresses invoice-to-cash.</div>
+        <div class="mini-card__impact">1.6 days off DSO</div>
+      </div>
 
     </div>
-  </div>
+  </section>
 
   <footer class="page-footer">
     <div class="footer-nav">
@@ -717,47 +992,51 @@
       localStorage.setItem('otcTheme', next);
     });
 
-    // Storyboard reveal sequence
-    let isRunning = false;
-    async function runStoryboard() {
-      if (isRunning) return;
-      isRunning = true;
-      const btn = document.getElementById('runBtn');
+    // Storyboard reveal — parameterized for two storyboards
+    const runningMap = {};
+    async function runStoryboard(boardId, btnId) {
+      if (runningMap[boardId]) return;
+      runningMap[boardId] = true;
+
+      const btn = document.getElementById(btnId);
       btn.dataset.running = 'true';
       btn.disabled = true;
       btn.textContent = '● Running…';
 
-      const board = document.getElementById('storyboard');
+      const board = document.getElementById(boardId);
       board.classList.add('is-active');
+
+      const stages = board.querySelectorAll('.stage');
+      const arrows = board.querySelectorAll('.arrow-between');
+      const audit  = board.querySelector('.audit-log');
+
       // reset
-      ['stage-1','stage-2','stage-3','stage-4'].forEach(id => {
-        const el = document.getElementById(id);
-        el.classList.remove('is-revealed','is-active');
-      });
-      ['arrow-1','arrow-2','arrow-3'].forEach(id => {
-        const el = document.getElementById(id);
-        el.classList.remove('is-revealed');
-      });
+      stages.forEach(el => el.classList.remove('is-revealed','is-active'));
+      arrows.forEach(el => el.classList.remove('is-revealed'));
+      if (audit) audit.classList.remove('is-revealed');
 
       const sleep = ms => new Promise(r => setTimeout(r, ms));
-      const stages = ['stage-1','stage-2','stage-3','stage-4'];
-      const arrows = ['arrow-1','arrow-2','arrow-3'];
 
       for (let i = 0; i < stages.length; i++) {
-        const el = document.getElementById(stages[i]);
-        el.classList.add('is-revealed','is-active');
+        stages[i].classList.add('is-revealed','is-active');
         if (i > 0) {
-          const prev = document.getElementById(stages[i-1]);
-          prev.classList.remove('is-active');
-          document.getElementById(arrows[i-1]).classList.add('is-revealed');
+          stages[i-1].classList.remove('is-active');
+          if (arrows[i-1]) arrows[i-1].classList.add('is-revealed');
         }
         await sleep(2200);
       }
-      // Final: leave step 4 highlighted
+
+      // Reveal audit log if present
+      if (audit) {
+        await sleep(500);
+        audit.classList.add('is-revealed');
+        await sleep(800);
+      }
+
       btn.disabled = false;
       btn.dataset.running = 'false';
       btn.textContent = '↻ Run again';
-      isRunning = false;
+      runningMap[boardId] = false;
     }
   </script>
 
