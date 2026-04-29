@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture — Commercial Experience Agent · Retail & Fashion</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #000000;
+      --canvas:        #0d0e10;
+      --surface:       #1c1c1e;
+      --card-bg:       #1c1c1e;
+      --card-border:   rgba(255,255,255,0.1);
+      --card-border-h: rgba(255,255,255,0.22);
+      --accent:        #2997ff;
+      --accent-2:      #5ac8fa;
+      --good:          #30d158;
+      --watch:         #ff9f0a;
+      --red:           #ff453a;
+      --text:          #f5f5f7;
+      --text-2:        #a1a1a6;
+      --text-3:        #6e6e73;
+      --eyebrow:       #2997ff;
+      --divider:       rgba(255,255,255,0.1);
+
+      /* Architecture-specific tokens */
+      --custom:        #a855f7;
+      --custom-bg:     rgba(168,85,247,0.08);
+      --ord:           #ec4899;
+      --a2a:           #14b8a6;
+      --trust:         #10b981;
+      --sap-blue:      #0a6ed1;
+
+      --panel-bg:      rgba(255,255,255,0.025);
+      --panel-border:  rgba(255,255,255,0.12);
+      --inner-bg:      rgba(255,255,255,0.04);
+      --inner-border:  rgba(255,255,255,0.08);
+
+      --joule-bg:      rgba(99,102,241,0.07);
+      --joule-border:  rgba(99,102,241,0.32);
+      --catalog-bg:    rgba(168,85,247,0.06);
+      --catalog-border:rgba(168,85,247,0.28);
+      --azure-bg:      rgba(0,120,212,0.06);
+      --azure-border:  rgba(0,120,212,0.28);
+      --gcp-bg:        rgba(66,133,244,0.05);
+      --gcp-border:    rgba(66,133,244,0.22);
+      --aws-bg:        rgba(255,153,0,0.04);
+      --aws-border:    rgba(255,153,0,0.18);
+    }
+    [data-theme="light"] {
+      --bg:            #f5f5f7;
+      --canvas:        #ffffff;
+      --surface:       #ffffff;
+      --card-bg:       #ffffff;
+      --card-border:   rgba(0,0,0,0.1);
+      --card-border-h: rgba(0,0,0,0.2);
+      --accent:        #0071e3;
+      --accent-2:      #0077ed;
+      --text:          #1d1d1f;
+      --text-2:        #5b5b60;
+      --text-3:        #86868b;
+      --eyebrow:       #0071e3;
+      --divider:       rgba(0,0,0,0.1);
+
+      --custom:        #8b5cf6;
+      --custom-bg:     rgba(139,92,246,0.08);
+      --ord:           #db2777;
+      --a2a:           #0d9488;
+      --trust:         #059669;
+
+      --panel-bg:      #ffffff;
+      --panel-border:  rgba(0,0,0,0.12);
+      --inner-bg:      #f8f9fb;
+      --inner-border:  rgba(0,0,0,0.07);
+
+      --joule-bg:      #f3f4ff;
+      --joule-border:  rgba(99,102,241,0.36);
+      --catalog-bg:    #faf5ff;
+      --catalog-border:rgba(168,85,247,0.36);
+      --azure-bg:      #eff7ff;
+      --azure-border:  rgba(0,120,212,0.32);
+      --gcp-bg:        #f4f8ff;
+      --gcp-border:    rgba(66,133,244,0.28);
+      --aws-bg:        #fff8ee;
+      --aws-border:    rgba(255,153,0,0.28);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* HEADER */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 22px; height: 44px;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--divider);
+    }
+    [data-theme="light"] .page-header { background: rgba(245,245,247,0.85); }
+    .page-header__left { display: flex; align-items: center; gap: 0.7rem; }
+    .brand-wordmark { font-weight: 600; font-size: 0.85rem; letter-spacing: -0.01em; color: var(--text); }
+    .brand-wordmark a { color: inherit; text-decoration: none; }
+    .header-divider { width: 1px; height: 16px; background: var(--divider); }
+    .product-label { font-size: 0.78rem; font-weight: 500; color: var(--text-2); }
+    .page-nav { display: flex; gap: 0.1rem; }
+    .page-nav__link {
+      font-size: 0.75rem; color: var(--text-3);
+      text-decoration: none; padding: 0.28rem 0.6rem; border-radius: 980px;
+      transition: color 0.24s, background 0.24s;
+    }
+    .page-nav__link:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+    [data-theme="light"] .page-nav__link:hover { background: rgba(0,0,0,0.05); }
+    .page-nav__link.is-active { color: var(--accent); background: rgba(41,151,255,0.1); }
+    .theme-toggle {
+      background: transparent; border: none; border-radius: 980px;
+      padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.78rem; color: var(--accent);
+      transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(41,151,255,0.12); }
+    .theme-icon--light { display: none; }
+    [data-theme="light"] .theme-icon--dark { display: none; }
+    [data-theme="light"] .theme-icon--light { display: inline; }
+
+    /* HERO */
+    .arch-hero {
+      max-width: 1320px; margin: 0 auto; padding: 2.6rem 1.5rem 1.4rem;
+      text-align: center;
+    }
+    .arch-eyebrow {
+      display: inline-block; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--eyebrow);
+      margin-bottom: 0.7rem;
+    }
+    .arch-hero h1 {
+      font-size: clamp(1.75rem, 3.2vw, 2.4rem); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.1;
+      font-family: "SF Pro Display", "Helvetica Neue", sans-serif;
+      margin-bottom: 0.8rem;
+    }
+    .arch-hero p.lead {
+      font-size: 0.95rem; color: var(--text-2); max-width: 800px;
+      margin: 0 auto 1.2rem; line-height: 1.65;
+    }
+    .arch-hero p.lead strong { color: var(--text); font-weight: 600; }
+
+    .layer-pills {
+      display: inline-flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .layer-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.74rem; padding: 0.32rem 0.8rem;
+      border-radius: 100px;
+      background: var(--inner-bg);
+      border: 1px solid;
+    }
+    .layer-pill--lean    { color: #5ac8fa; border-color: rgba(41,151,255,0.32); background: rgba(41,151,255,0.08); }
+    .layer-pill--hybrid  { color: #c9a8ff; border-color: rgba(168,85,247,0.32); background: rgba(168,85,247,0.08); }
+    .layer-pill--agentic { color: #5eead4; border-color: rgba(20,184,166,0.32); background: rgba(20,184,166,0.08); }
+
+    /* DIAGRAM CANVAS */
+    .arch-canvas-wrap {
+      max-width: 1320px; margin: 0 auto; padding: 0 1.5rem 1rem;
+      overflow-x: auto;
+    }
+    .arch-canvas {
+      position: relative;
+      width: 1280px;
+      height: 760px;
+      background: var(--canvas);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      margin: 0 auto;
+    }
+    [data-theme="light"] .arch-canvas { box-shadow: 0 12px 40px rgba(0,0,0,0.07); }
+
+    .arch-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 5;
+    }
+    .arch-overlay path {
+      fill: none; stroke-width: 2;
+    }
+    .arch-overlay .line-ord     { stroke: var(--ord);   marker-end: url(#arrow-ord); }
+    .arch-overlay .line-a2a     { stroke: var(--a2a);   marker-end: url(#arrow-a2a); marker-start: url(#arrow-a2a-start); }
+    .arch-overlay .line-trust   { stroke: var(--trust); marker-end: url(#arrow-trust); }
+    .arch-overlay .line-sap     { stroke: var(--text-3); stroke-width: 1.5; marker-end: url(#arrow-sap); marker-start: url(#arrow-sap-start); opacity: 0.55; }
+    .arch-overlay .line-faded   { opacity: 0.18; }
+    .arch-overlay .line-label {
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+      fill: var(--text);
+    }
+    .arch-overlay .label-bg { fill: var(--canvas); }
+    [data-theme="light"] .arch-overlay .label-bg { fill: var(--canvas); }
+
+    /* ZONES (absolutely positioned inside arch-canvas) */
+    .zone {
+      position: absolute;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+    }
+    .zone__head {
+      padding: 0.55rem 0.85rem 0.45rem;
+      display: flex; align-items: center; gap: 0.45rem;
+      border-bottom: 1px solid var(--inner-border);
+    }
+    .zone__head--minimal { border-bottom: none; }
+    .zone__brand {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: -0.005em;
+    }
+    .zone__brand .accent { color: var(--accent-2); }
+    .zone__brand .azure  { color: #4da3ff; }
+    .zone__brand .gcp    { color: #76a5e8; }
+    .zone__brand .aws    { color: #ffaa3a; }
+    .zone__brand-tag {
+      font-size: 0.68rem; font-weight: 700;
+      padding: 1px 5px; border-radius: 4px;
+      background: rgba(10,110,209,0.14); color: #5ac8fa;
+      border: 1px solid rgba(10,110,209,0.3);
+    }
+    .zone__sub {
+      padding: 0.55rem 0.9rem; font-size: 0.66rem; font-weight: 700;
+      color: var(--text-3); letter-spacing: 0.05em; text-transform: uppercase;
+    }
+
+    /* SAP APPLICATIONS */
+    .zone--sap-apps { left: 22px; top: 70px; width: 174px; }
+    .zone--sap-apps .zone__head { justify-content: flex-start; }
+    .zone--sap-apps .app-stack { padding: 0.6rem 0.7rem 0.7rem; display: flex; flex-direction: column; gap: 0.42rem; }
+    .app-pill {
+      padding: 0.6rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid rgba(10,110,209,0.32);
+      background: rgba(10,110,209,0.04);
+      font-size: 0.78rem; font-weight: 600; color: var(--text);
+      text-align: center;
+    }
+    .app-pill.is-faded { opacity: 0.32; }
+
+    /* BTP MAIN ZONE */
+    .zone--btp { left: 220px; top: 32px; width: 560px; height: 696px; }
+    .zone--btp .zone__head {
+      background: rgba(10,110,209,0.04);
+      padding: 0.6rem 0.95rem 0.5rem;
+    }
+    [data-theme="light"] .zone--btp .zone__head { background: rgba(10,110,209,0.04); }
+    .btp-subaccount {
+      position: absolute; top: 50px; left: 14px; right: 14px; bottom: 14px;
+      border: 1px solid var(--inner-border);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.012);
+    }
+    [data-theme="light"] .btp-subaccount { background: #fafbfd; }
+    .btp-subaccount__label {
+      position: absolute; left: 14px; top: 9px;
+      font-size: 0.78rem; font-weight: 700; color: var(--text);
+    }
+
+    /* PANEL — generic sub-component panel inside BTP or Cloud */
+    .panel {
+      position: absolute;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .panel__head {
+      padding: 0.55rem 0.75rem 0.45rem;
+      border-bottom: 1px solid var(--inner-border);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .panel__head .icon {
+      width: 20px; height: 20px; border-radius: 5px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .panel__title { font-size: 0.82rem; font-weight: 700; line-height: 1.1; color: var(--text); }
+    .panel__sub   { font-size: 0.64rem; color: var(--text-3); font-style: italic; }
+    .panel__body  { padding: 0.55rem 0.65rem 0.65rem; display: flex; flex-direction: column; gap: 0.4rem; }
+
+    /* CUSTOM IMPLEMENTATION marker — purple border treatment */
+    .panel--custom, .pill--custom {
+      border-color: var(--custom) !important;
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.18);
+    }
+    [data-theme="light"] .panel--custom, [data-theme="light"] .pill--custom {
+      box-shadow: 0 0 0 1px rgba(139,92,246,0.18);
+    }
+
+    /* JOULE */
+    .panel--joule {
+      left: 28px; top: 55px; width: 248px; height: 295px;
+      background: var(--joule-bg); border-color: var(--joule-border);
+    }
+    .panel--joule .panel__head { background: rgba(99,102,241,0.05); }
+    .panel--joule .panel__title { color: #a5b4fc; }
+    .joule-icon {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+    }
+
+    /* AGENT CATALOG */
+    .panel--catalog {
+      left: 288px; top: 55px; width: 234px; height: 412px;
+      background: var(--catalog-bg); border-color: var(--catalog-border);
+    }
+    .panel--catalog .panel__head { background: rgba(168,85,247,0.05); }
+    .panel--catalog .panel__title { color: #c9a8ff; }
+    .panel--catalog .panel__body { gap: 0.55rem; }
+
+    .subpanel {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--inner-border);
+      border-radius: 7px;
+      padding: 0.42rem 0.5rem;
+      display: flex; flex-direction: column; gap: 0.32rem;
+    }
+    [data-theme="light"] .subpanel { background: #ffffff; }
+    .subpanel__title {
+      font-size: 0.73rem; font-weight: 700; color: var(--text);
+      padding: 0.06rem 0.1rem 0.18rem;
+    }
+
+    /* PILLS inside panels */
+    .pill {
+      padding: 0.36rem 0.55rem;
+      border-radius: 6px;
+      background: var(--inner-bg);
+      border: 1px solid var(--inner-border);
+      font-size: 0.7rem; font-weight: 600; color: var(--text);
+      line-height: 1.2;
+    }
+    .pill .pill__label {
+      font-size: 0.6rem; font-weight: 500; color: var(--text-3);
+      font-style: italic; display: block; margin-top: 1px;
+    }
+    .pill.is-faded { opacity: 0.38; }
+
+    /* AGENT CONNECTOR (BTP) */
+    .panel--connector {
+      left: 28px; top: 380px; width: 248px; height: 78px;
+      background: var(--custom-bg); border-color: var(--custom);
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.18);
+    }
+    .panel--connector .panel__head { border-bottom: none; padding-bottom: 0.2rem; }
+    .panel--connector .panel__sub { font-style: italic; }
+
+    /* HANA Cloud (faded) */
+    .panel--hana {
+      left: 186px; top: 545px; width: 160px; height: 60px;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--inner-border);
+      opacity: 0.42;
+      display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+      font-size: 0.74rem;
+    }
+    .hana-icon {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: linear-gradient(135deg, #0a6ed1, #5ac8fa);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; color: white; font-weight: 800;
+    }
+
+    /* NETWORK DIVIDER */
+    .net-divider {
+      position: absolute; top: 32px; bottom: 32px;
+      left: 800px; width: 1px;
+      background: var(--text-3); opacity: 0.55;
+    }
+    .net-divider__label {
+      position: absolute; top: -22px; left: -28px;
+      font-size: 0.7rem; font-weight: 700; color: var(--text-2);
+    }
+
+    /* CLOUD ZONES (right side) */
+    .zone--azure { left: 832px; top: 32px; width: 420px; height: 230px;
+                   background: var(--azure-bg); border-color: var(--azure-border); }
+    .zone--gcp   { left: 832px; top: 280px; width: 420px; height: 200px;
+                   background: var(--gcp-bg); border-color: var(--gcp-border); opacity: 0.5; }
+    .zone--aws   { left: 832px; top: 500px; width: 420px; height: 192px;
+                   background: var(--aws-bg); border-color: var(--aws-border); opacity: 0.42; }
+
+    .cloud-logo {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+    }
+    .cloud-logo.azure { background: linear-gradient(135deg, #0078D4, #50e6ff); color: white; }
+    .cloud-logo.gcp   { background: linear-gradient(135deg, #4285F4, #34A853); color: white; }
+    .cloud-logo.aws   { background: linear-gradient(135deg, #FF9900, #232f3e); color: white; }
+
+    .cloud-panels {
+      position: absolute; top: 46px; left: 14px; right: 14px; bottom: 14px;
+      display: flex; gap: 12px;
+    }
+
+    .cloud-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .cloud-panel__head {
+      padding: 0.55rem 0.7rem 0.45rem;
+      border-bottom: 1px solid var(--inner-border);
+    }
+    .cloud-panel__head .pt {
+      font-size: 0.76rem; font-weight: 700; color: var(--text); line-height: 1.15;
+    }
+    .cloud-panel__head .ps {
+      font-size: 0.62rem; color: var(--text-3); font-style: italic;
+    }
+    .cloud-panel__body {
+      padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.35rem;
+    }
+
+    /* AZURE primary panel highlights */
+    .cloud-panel--azure-cat {
+      border-color: var(--custom);
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.18);
+    }
+    .cloud-panel--azure-cat .cloud-panel__head .pt { color: #c9a8ff; }
+    .cloud-panel--azure-foundry .cloud-panel__head .pt { color: #4da3ff; }
+    .cloud-panel--gcp-cat .cloud-panel__head .pt { color: #76a5e8; }
+    .cloud-panel--vertex   .cloud-panel__head .pt { color: #76a5e8; }
+    .cloud-panel--aws-cat  .cloud-panel__head .pt { color: #ffaa3a; }
+    .cloud-panel--bedrock  .cloud-panel__head .pt { color: #ffaa3a; }
+
+    /* LEGEND below diagram */
+    .legend-wrap {
+      max-width: 1320px; margin: 0 auto; padding: 0.4rem 1.5rem 3rem;
+    }
+    .legend-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+    }
+    .legend-card {
+      padding: 0.85rem 1rem;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px;
+    }
+    .legend-card__title {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--text-3);
+      margin-bottom: 0.5rem;
+    }
+    .legend-row {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.32rem 0;
+      font-size: 0.78rem; color: var(--text-2);
+    }
+    .legend-row strong { color: var(--text); font-weight: 600; }
+    .legend-line {
+      width: 28px; height: 2px; flex-shrink: 0;
+      position: relative;
+    }
+    .legend-line::after {
+      content: ''; position: absolute; right: -4px; top: -3px;
+      border: 4px solid transparent;
+      border-left: 6px solid currentColor;
+    }
+    .legend-line--ord   { background: var(--ord);   color: var(--ord); }
+    .legend-line--a2a   { background: var(--a2a);   color: var(--a2a); }
+    .legend-line--trust { background: var(--trust); color: var(--trust); }
+    .legend-line--sap   { background: var(--text-3); color: var(--text-3); opacity: 0.6; }
+
+    .legend-swatch {
+      width: 18px; height: 14px; border-radius: 3px; flex-shrink: 0;
+      border: 1px solid;
+    }
+    .legend-swatch--custom {
+      background: var(--custom-bg);
+      border-color: var(--custom);
+      box-shadow: 0 0 0 1px rgba(168,85,247,0.2);
+    }
+    .legend-swatch--faded {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--text-3);
+      opacity: 0.5;
+    }
+
+    /* Layer-mapping table */
+    .layer-table {
+      margin-top: 1.6rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .layer-table__row {
+      display: grid; grid-template-columns: 180px 1fr;
+      border-top: 1px solid var(--divider);
+      align-items: stretch;
+    }
+    .layer-table__row:first-child { border-top: none; }
+    .layer-table__head {
+      padding: 1rem 1.1rem;
+      font-size: 0.85rem; font-weight: 700;
+      display: flex; flex-direction: column; gap: 0.25rem;
+      border-right: 1px solid var(--divider);
+    }
+    .layer-table__head--lean    { background: rgba(41,151,255,0.05);  color: #5ac8fa; }
+    .layer-table__head--hybrid  { background: rgba(168,85,247,0.05);  color: #c9a8ff; }
+    .layer-table__head--agentic { background: rgba(20,184,166,0.05);  color: #5eead4; }
+    .layer-table__head__sub {
+      font-size: 0.66rem; font-weight: 600; color: var(--text-3); text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .layer-table__body {
+      padding: 1rem 1.1rem;
+      font-size: 0.84rem; color: var(--text-2); line-height: 1.6;
+    }
+    .layer-table__body strong { color: var(--text); font-weight: 600; }
+    .layer-table__chips {
+      display: flex; flex-wrap: wrap; gap: 0.32rem; margin-top: 0.5rem;
+    }
+    .layer-chip {
+      font-size: 0.64rem; font-weight: 700; padding: 0.18rem 0.5rem;
+      border-radius: 5px; border: 1px solid;
+    }
+    .layer-chip--s4    { background: rgba(10,110,209,0.1);  color: #60a5fa; border-color: rgba(10,110,209,0.3); }
+    .layer-chip--btp   { background: rgba(168,85,247,0.1);  color: #c9a8ff; border-color: rgba(168,85,247,0.3); }
+    .layer-chip--ms    { background: rgba(0,120,212,0.1);   color: #4da3ff; border-color: rgba(0,120,212,0.3); }
+    .layer-chip--ms2   { background: rgba(0,183,195,0.1);   color: #5eead4; border-color: rgba(0,183,195,0.3); }
+    .layer-chip--ms3   { background: rgba(134,97,197,0.12); color: #c9a8ff; border-color: rgba(134,97,197,0.32); }
+
+    /* FOOTER */
+    .page-footer {
+      max-width: 1440px; margin: 0 auto;
+      border-top: 1px solid var(--divider);
+      padding: 1.1rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;
+      font-size: 0.74rem; color: var(--text-3);
+    }
+    .footer-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .footer-nav a {
+      color: var(--text-3); text-decoration: none;
+      padding: 0.18rem 0.4rem; border-radius: 5px;
+    }
+    .footer-nav a:hover { color: var(--text); }
+    .footer-nav a.is-active { color: var(--accent); }
+
+    @media (max-width: 1340px) {
+      .arch-canvas-wrap { padding-bottom: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="page-header__left">
+      <div class="brand-wordmark"><a href="index.html">Lean Core</a></div>
+      <span class="header-divider"></span>
+      <span class="product-label">Commercial Experience Agent · Retail & Fashion</span>
+    </div>
+    <nav class="page-nav">
+      <a class="page-nav__link" href="use-cases.html">AI Use Cases</a>
+      <a class="page-nav__link" href="risk-dashboard.html">Risk Dashboard</a>
+      <a class="page-nav__link is-active" href="architecture.html">Architecture</a>
+      <a class="page-nav__link" href="#">System Health</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+      <span class="theme-icon theme-icon--dark">🌙</span>
+      <span class="theme-icon theme-icon--light">☀️</span>
+    </button>
+  </header>
+
+  <!-- HERO -->
+  <section class="arch-hero">
+    <span class="arch-eyebrow">System Architecture · How the agent fabric is wired</span>
+    <h1>One agent fabric. SAP at the core, Microsoft at the edge.</h1>
+    <p class="lead">Every agent — internal to Joule, external in Azure AI Foundry, or anywhere else — registers via <strong>ORD</strong>, communicates via <strong>A2A</strong>, and operates inside a single <strong>Trust</strong> boundary. The pattern is identical whether the agent runs on SAP BTP, Microsoft Azure, Google Cloud, or AWS.</p>
+    <div class="layer-pills">
+      <span class="layer-pill layer-pill--lean">Lean Core · SAP S/4HANA + aATP</span>
+      <span class="layer-pill layer-pill--hybrid">Hybrid Edge · SAP BTP / BDC</span>
+      <span class="layer-pill layer-pill--agentic">Agentic Edge · Microsoft</span>
+    </div>
+  </section>
+
+  <!-- DIAGRAM -->
+  <div class="arch-canvas-wrap">
+    <div class="arch-canvas">
+
+      <!-- SVG OVERLAY — connection lines -->
+      <svg class="arch-overlay" viewBox="0 0 1280 760" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrow-ord" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ec4899"/></marker>
+          <marker id="arrow-a2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#14b8a6"/></marker>
+          <marker id="arrow-a2a-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 10 0 L 0 5 L 10 10 z" fill="#14b8a6"/></marker>
+          <marker id="arrow-trust" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/></marker>
+          <marker id="arrow-sap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6e6e73"/></marker>
+          <marker id="arrow-sap-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 10 0 L 0 5 L 10 10 z" fill="#6e6e73"/></marker>
+        </defs>
+
+        <!-- SAP Apps ↔ BTP (gray bidirectional, mid-height) -->
+        <path class="line-sap" d="M 196 320 L 220 320" />
+        <!-- second flow line, slightly lower for visual texture -->
+        <path class="line-sap" d="M 196 380 L 220 380" />
+
+        <!-- ORD: Joule → Agent Catalog (within BTP) -->
+        <path class="line-ord" d="M 510 220 L 522 220" />
+        <!-- ORD: Joule → Agent Connector (within BTP, vertical bend) -->
+        <path class="line-ord" d="M 376 432 L 376 462" />
+
+        <!-- A2A: Agent Connector ↔ Agent Catalog A2A Router -->
+        <path class="line-a2a" d="M 496 500 C 512 500, 512 412, 522 412" />
+
+        <!-- ORD: Catalog → External Microsoft Catalog -->
+        <path class="line-ord" d="M 780 132 L 832 132" />
+        <rect class="label-bg" x="788" y="118" width="38" height="18" rx="9"/>
+        <text class="line-label" x="807" y="131" text-anchor="middle" fill="#ec4899">ORD</text>
+
+        <!-- A2A: Catalog A2A Router → External Microsoft Connector -->
+        <path class="line-a2a" d="M 780 412 L 802 412 L 802 218 L 832 218" />
+        <rect class="label-bg" x="788" y="398" width="38" height="18" rx="9"/>
+        <text class="line-label" x="807" y="411" text-anchor="middle" fill="#14b8a6">A2A</text>
+
+        <!-- Trust: Catalog → External Microsoft -->
+        <path class="line-trust" d="M 780 200 L 832 200" />
+        <rect class="label-bg" x="784" y="186" width="46" height="18" rx="9"/>
+        <text class="line-label" x="807" y="199" text-anchor="middle" fill="#10b981">TRUST</text>
+
+        <!-- ORD: Catalog → Google Cloud (faded) -->
+        <path class="line-ord line-faded" d="M 780 148 C 808 148, 808 360, 832 360" />
+        <!-- A2A: Catalog → Google (faded) -->
+        <path class="line-a2a line-faded" d="M 780 428 C 808 428, 808 430, 832 430" />
+        <!-- Trust: Catalog → Google (faded) -->
+        <path class="line-trust line-faded" d="M 780 215 C 808 215, 808 385, 832 385" />
+
+        <!-- ORD: Catalog → AWS (faded) -->
+        <path class="line-ord line-faded" d="M 780 165 C 810 165, 810 580, 832 580" />
+        <!-- A2A: Catalog → AWS (faded) -->
+        <path class="line-a2a line-faded" d="M 780 445 C 814 445, 814 640, 832 640" />
+      </svg>
+
+      <!-- ZONE: SAP APPLICATIONS -->
+      <div class="zone zone--sap-apps">
+        <div class="zone__head">
+          <span class="zone__brand"><span class="accent">SAP</span> Applications</span>
+        </div>
+        <div class="app-stack">
+          <div class="app-pill">SAP S/4HANA</div>
+          <div class="app-pill">SAP aATP</div>
+          <div class="app-pill">SAP MDG · RFM</div>
+          <div class="app-pill">SAP Ariba</div>
+          <div class="app-pill is-faded">SAP CAR</div>
+          <div class="app-pill is-faded">SAP Concur</div>
+          <div class="app-pill is-faded">SAP SuccessFactors</div>
+        </div>
+      </div>
+
+      <!-- ZONE: SAP BTP -->
+      <div class="zone zone--btp">
+        <div class="zone__head">
+          <span class="zone__brand"><span class="accent">SAP</span> <span class="zone__brand-tag">BTP</span></span>
+        </div>
+        <div class="btp-subaccount">
+          <div class="btp-subaccount__label">Subaccount</div>
+
+          <!-- Joule -->
+          <div class="panel panel--joule">
+            <div class="panel__head">
+              <div class="icon joule-icon">◆</div>
+              <div>
+                <div class="panel__title">Joule</div>
+                <div class="panel__sub">Agent Builder</div>
+              </div>
+            </div>
+            <div class="panel__body">
+              <div class="pill pill--custom">Commercial Experience Agent</div>
+              <div class="pill pill--custom">Stock Protection Agent</div>
+              <div class="pill pill--custom">VAS Re-determination Agent</div>
+              <div class="pill">Other Agents</div>
+            </div>
+          </div>
+
+          <!-- Agent Catalog -->
+          <div class="panel panel--catalog">
+            <div class="panel__head">
+              <div>
+                <div class="panel__title">Agent Catalog</div>
+                <div class="panel__sub">CAP Application</div>
+              </div>
+            </div>
+            <div class="panel__body">
+
+              <div class="subpanel">
+                <div class="subpanel__title">ORD Aggregator</div>
+                <div class="pill">Agent Registration<span class="pill__label">internal Agents</span></div>
+                <div class="pill">List registered agents<span class="pill__label">internal/external</span></div>
+                <div class="pill is-faded">Catalog Federation<span class="pill__label">internal/external</span></div>
+              </div>
+
+              <div class="subpanel">
+                <div class="subpanel__title">A2A Router <span style="font-size:0.62rem;font-style:italic;color:var(--text-3);font-weight:500;">A2A Client</span></div>
+                <div class="pill">Agent Trigger<span class="pill__label">internal/external</span></div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Agent Connector -->
+          <div class="panel panel--connector panel--custom">
+            <div class="panel__head">
+              <div>
+                <div class="panel__title">Agent Connector</div>
+                <div class="panel__sub">CAP Application · ORD &amp; A2A Server</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HANA Cloud (faded) -->
+          <div class="panel panel--hana">
+            <div class="hana-icon">H</div>
+            <span>SAP HANA Cloud</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- NETWORK DIVIDER -->
+      <div class="net-divider">
+        <span class="net-divider__label">Network</span>
+      </div>
+
+      <!-- ZONE: MICROSOFT AZURE (prominent) -->
+      <div class="zone zone--azure">
+        <div class="zone__head">
+          <div class="cloud-logo azure">⊞</div>
+          <span class="zone__brand"><span class="azure">Microsoft Azure</span></span>
+        </div>
+        <div class="cloud-panels">
+          <div class="cloud-panel cloud-panel--azure-cat">
+            <div class="cloud-panel__head">
+              <div class="pt">Catalog</div>
+              <div class="ps">Agent Connector (ORD &amp; A2A Server)</div>
+            </div>
+          </div>
+          <div class="cloud-panel cloud-panel--azure-foundry">
+            <div class="cloud-panel__head">
+              <div class="pt">Azure AI Foundry</div>
+              <div class="ps">Copilot Studio + Azure OpenAI</div>
+            </div>
+            <div class="cloud-panel__body">
+              <div class="pill pill--custom" style="font-size:0.66rem;">Pricing Data Prep Agent</div>
+              <div class="pill pill--custom" style="font-size:0.66rem;">Three-Way Match Agent</div>
+              <div class="pill" style="font-size:0.66rem;">MS Fabric Agent</div>
+              <div class="pill" style="font-size:0.66rem;">Dynamics 365 Agent</div>
+              <div class="pill" style="font-size:0.66rem;">Power Automate Agent</div>
+              <div class="pill" style="font-size:0.66rem;">Other Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE: GOOGLE CLOUD (faded) -->
+      <div class="zone zone--gcp">
+        <div class="zone__head">
+          <div class="cloud-logo gcp">G</div>
+          <span class="zone__brand"><span class="gcp">Google Cloud</span></span>
+        </div>
+        <div class="cloud-panels">
+          <div class="cloud-panel cloud-panel--gcp-cat">
+            <div class="cloud-panel__head">
+              <div class="pt">Catalog</div>
+              <div class="ps">Agent Connector (ORD &amp; A2A Server)</div>
+            </div>
+          </div>
+          <div class="cloud-panel cloud-panel--vertex">
+            <div class="cloud-panel__head">
+              <div class="pt">Google Vertex AI</div>
+              <div class="ps">ADK on Agent Engine</div>
+            </div>
+            <div class="cloud-panel__body">
+              <div class="pill" style="font-size:0.66rem;">Vertex Agents</div>
+              <div class="pill" style="font-size:0.66rem;">Other Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE: AWS (faded) -->
+      <div class="zone zone--aws">
+        <div class="zone__head">
+          <div class="cloud-logo aws">a</div>
+          <span class="zone__brand"><span class="aws">AWS</span></span>
+        </div>
+        <div class="cloud-panels">
+          <div class="cloud-panel cloud-panel--aws-cat">
+            <div class="cloud-panel__head">
+              <div class="pt">Catalog</div>
+              <div class="ps">Agent Connector (ORD &amp; A2A Server)</div>
+            </div>
+          </div>
+          <div class="cloud-panel cloud-panel--bedrock">
+            <div class="cloud-panel__head">
+              <div class="pt">Bedrock Agents</div>
+              <div class="ps">via AWS Bedrock</div>
+            </div>
+            <div class="cloud-panel__body">
+              <div class="pill" style="font-size:0.66rem;">Bedrock Agents</div>
+              <div class="pill" style="font-size:0.66rem;">Other Agents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LEGEND + LAYER MAPPING -->
+  <section class="legend-wrap">
+    <div class="legend-grid">
+
+      <div class="legend-card">
+        <div class="legend-card__title">Connection types</div>
+        <div class="legend-row"><span class="legend-line legend-line--ord"></span><span><strong>ORD</strong> · Open Resource Discovery — agent + capability registration</span></div>
+        <div class="legend-row"><span class="legend-line legend-line--a2a"></span><span><strong>A2A</strong> · Agent-to-Agent — runtime invocation across agents</span></div>
+        <div class="legend-row"><span class="legend-line legend-line--trust"></span><span><strong>Trust</strong> · Federated identity + policy boundary across clouds</span></div>
+        <div class="legend-row"><span class="legend-line legend-line--sap"></span><span>SAP application data flow into BTP</span></div>
+      </div>
+
+      <div class="legend-card">
+        <div class="legend-card__title">Implementation indicators</div>
+        <div class="legend-row"><span class="legend-swatch legend-swatch--custom"></span><span><strong>Custom Implementation</strong> — purple-bordered components are bespoke for the Commercial Experience Agent</span></div>
+        <div class="legend-row"><span class="legend-swatch legend-swatch--faded"></span><span><strong>Faded</strong> — installed footprint or future-state, not active in this rollout</span></div>
+      </div>
+
+      <div class="legend-card">
+        <div class="legend-card__title">Why this pattern</div>
+        <div class="legend-row" style="font-size:0.76rem;line-height:1.6;">Same registration (ORD), runtime (A2A), and trust contract everywhere. <strong>Switching agentic edges does not change SAP.</strong> Microsoft today, Google or AWS tomorrow — Joule and the Agent Catalog stay still.</div>
+      </div>
+
+    </div>
+
+    <!-- LAYER MAPPING TABLE -->
+    <div class="layer-table">
+
+      <div class="layer-table__row">
+        <div class="layer-table__head layer-table__head--lean">
+          Lean Core
+          <span class="layer-table__head__sub">SAP S/4HANA + aATP</span>
+        </div>
+        <div class="layer-table__body">
+          The system of record. Every wholesale PO, article master, season, allocation, condition record, and audit trail lives here. <strong>aATP</strong> drives all fulfilment logic — PAC, ABC, BOP, Supply Protection, Product Allocation, Season Management. The agent invokes aATP; it never bypasses it.
+          <div class="layer-table__chips">
+            <span class="layer-chip layer-chip--s4">S/4HANA</span>
+            <span class="layer-chip layer-chip--s4">aATP · PAC / ABC / BOP</span>
+            <span class="layer-chip layer-chip--s4">MDG · RFM</span>
+            <span class="layer-chip layer-chip--s4">Season Mgmt</span>
+            <span class="layer-chip layer-chip--s4">Supply Protection</span>
+            <span class="layer-chip layer-chip--s4">VAS Conditions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-table__row">
+        <div class="layer-table__head layer-table__head--hybrid">
+          Hybrid Edge
+          <span class="layer-table__head__sub">SAP BTP / BDC</span>
+        </div>
+        <div class="layer-table__body">
+          The integration fabric and agent runtime. <strong>Joule</strong> hosts orchestration agents that call S/4 + aATP. The <strong>Agent Catalog</strong> registers every agent — internal or external — via ORD, exposes a unified A2A invocation router, and federates identity across clouds. The <strong>Agent Connector</strong> serves ORD and A2A endpoints to external clouds. <strong>BDC</strong> is the unified semantic data layer.
+          <div class="layer-table__chips">
+            <span class="layer-chip layer-chip--btp">BTP Subaccount</span>
+            <span class="layer-chip layer-chip--btp">Joule · Agent Builder</span>
+            <span class="layer-chip layer-chip--btp">Agent Catalog · CAP</span>
+            <span class="layer-chip layer-chip--btp">ORD Aggregator</span>
+            <span class="layer-chip layer-chip--btp">A2A Router</span>
+            <span class="layer-chip layer-chip--btp">SAP BDC</span>
+            <span class="layer-chip layer-chip--btp">HANA Cloud</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-table__row">
+        <div class="layer-table__head layer-table__head--agentic">
+          Agentic Edge
+          <span class="layer-table__head__sub">Microsoft</span>
+        </div>
+        <div class="layer-table__body">
+          The agent runtime outside SAP. <strong>Azure AI Foundry</strong> hosts Copilot Studio + Azure OpenAI agents — drafting buyer communications, writing dispute letters, running three-way match. <strong>Microsoft Fabric</strong> ingests supplier mill telemetry, retailer POS, and weather/demand signals into ML-ready risk scores. <strong>Dynamics 365</strong> is the retailer-360 + buyer context store. <strong>Power Automate</strong> is the workflow + portal-submission layer; <strong>Teams + Outlook</strong> is the human surface.
+          <div class="layer-table__chips">
+            <span class="layer-chip layer-chip--ms">Azure AI Foundry</span>
+            <span class="layer-chip layer-chip--ms3">Copilot Studio</span>
+            <span class="layer-chip layer-chip--ms3">Azure OpenAI</span>
+            <span class="layer-chip layer-chip--ms2">MS Fabric</span>
+            <span class="layer-chip layer-chip--ms">Dynamics 365</span>
+            <span class="layer-chip layer-chip--ms">Power Automate</span>
+            <span class="layer-chip layer-chip--ms">Teams + Outlook</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <div class="footer-nav">
+      <a href="use-cases.html">AI Use Cases</a>
+      <a href="risk-dashboard.html">Risk Dashboard</a>
+      <a class="is-active" href="architecture.html">Architecture</a>
+      <a href="#">System Health</a>
+    </div>
+    <span>Commercial Experience Agent · Retail & Fashion · S/4HANA Core × BTP Hybrid × Microsoft Agentic</span>
+  </footer>
+
+  <script>
+    const html = document.documentElement;
+    const saved = localStorage.getItem('otcTheme') || 'dark';
+    html.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('otcTheme', next);
+    });
+  </script>
+
+</body>
+</html>
