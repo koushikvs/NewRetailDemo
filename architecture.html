@@ -242,14 +242,38 @@
     .zone--sap-apps .zone__head { justify-content: flex-start; }
     .zone--sap-apps .app-stack { padding: 0.6rem 0.7rem 0.7rem; display: flex; flex-direction: column; gap: 0.42rem; }
     .app-pill {
-      padding: 0.6rem 0.7rem;
+      padding: 0.5rem 0.55rem;
       border-radius: 8px;
       border: 1px solid rgba(10,110,209,0.32);
       background: rgba(10,110,209,0.04);
-      font-size: 0.78rem; font-weight: 600; color: var(--text);
-      text-align: center;
+      font-size: 0.74rem; font-weight: 600; color: var(--text);
+      display: flex; align-items: center; justify-content: space-between; gap: 0.35rem;
     }
-    .app-pill.is-faded { opacity: 0.32; }
+    .app-pill__name { flex: 1; text-align: left; line-height: 1.15; }
+    .app-pill__name small { display: block; font-size: 0.6rem; font-weight: 500; color: var(--text-3); font-style: italic; margin-top: 1px; }
+    .app-pill.is-faded { opacity: 0.42; }
+
+    /* STATUS BADGES (Deployed / New / Future) */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 0.52rem; font-weight: 800;
+      padding: 0.13rem 0.42rem;
+      border-radius: 100px;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      border: 1px solid;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .status-badge .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .status-badge--deployed { background: rgba(48,209,88,0.12);  color: #6ee7b7; border-color: rgba(48,209,88,0.32); }
+    .status-badge--deployed .dot { background: var(--good); }
+    .status-badge--new      { background: rgba(168,85,247,0.14); color: #c9a8ff; border-color: rgba(168,85,247,0.36); }
+    .status-badge--new      .dot { background: var(--custom); }
+    .status-badge--future   { background: rgba(160,160,170,0.1); color: var(--text-3); border-color: rgba(160,160,170,0.3); }
+    .status-badge--future   .dot { background: var(--text-3); }
+
+    /* Panel head badge alignment */
+    .panel__head .status-badge,
+    .zone__head .status-badge { margin-left: auto; }
 
     /* BTP MAIN ZONE */
     .zone--btp { left: 220px; top: 32px; width: 560px; height: 696px; }
@@ -540,6 +564,104 @@
     .layer-chip--ms2   { background: rgba(0,183,195,0.1);   color: #5eead4; border-color: rgba(0,183,195,0.3); }
     .layer-chip--ms3   { background: rgba(134,97,197,0.12); color: #c9a8ff; border-color: rgba(134,97,197,0.32); }
 
+    /* LANDSCAPE-FIT (Already / New) */
+    .landscape-fit-wrap { max-width: 1320px; margin: 0 auto; padding: 1.6rem 1.5rem 0.6rem; }
+    .landscape-fit-head { margin-bottom: 1rem; }
+    .landscape-fit-head h2 {
+      font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.25rem;
+    }
+    .landscape-fit-head p {
+      font-size: 0.84rem; color: var(--text-2); line-height: 1.55; max-width: 800px;
+    }
+    .landscape-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    @media (max-width: 880px) { .landscape-grid { grid-template-columns: 1fr; } }
+    .landscape-col {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .landscape-col--existing { border-top: 3px solid var(--good); }
+    .landscape-col--new      { border-top: 3px solid var(--custom); }
+
+    .landscape-col__head {
+      padding: 0.95rem 1.1rem 0.65rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    .landscape-col__icon {
+      width: 26px; height: 26px; border-radius: 7px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; font-weight: 800; color: white;
+      flex-shrink: 0;
+    }
+    .landscape-col--existing .landscape-col__icon { background: var(--good); }
+    .landscape-col--new .landscape-col__icon { background: var(--custom); }
+    .landscape-col__title { font-size: 0.92rem; font-weight: 700; color: var(--text); }
+    .landscape-col__sub   { font-size: 0.7rem; color: var(--text-3); margin-left: auto; font-style: italic; }
+
+    .landscape-list {
+      padding: 0.55rem 0.85rem 0.85rem; display: flex; flex-direction: column; gap: 0.32rem;
+    }
+    .landscape-item {
+      padding: 0.5rem 0.65rem;
+      background: var(--inner-bg); border: 1px solid var(--inner-border);
+      border-radius: 7px;
+      font-size: 0.78rem; color: var(--text-2);
+      line-height: 1.45;
+    }
+    .landscape-item strong { color: var(--text); font-weight: 700; }
+    .landscape-item small { color: var(--text-3); font-size: 0.68rem; font-style: italic; display: block; margin-top: 1px; }
+
+    /* TOUCHPOINTS */
+    .touchpoints-wrap { max-width: 1320px; margin: 0 auto; padding: 1.4rem 1.5rem 1.2rem; }
+    .touchpoints-head { margin-bottom: 0.85rem; }
+    .touchpoints-head h2 {
+      font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.25rem;
+    }
+    .touchpoints-head p {
+      font-size: 0.82rem; color: var(--text-2); line-height: 1.55; max-width: 800px;
+    }
+    .touchpoint-table {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .touchpoint-row {
+      display: grid; grid-template-columns: 220px 80px 1fr 1fr;
+      align-items: center; gap: 0.6rem;
+      padding: 0.7rem 1.1rem;
+      border-top: 1px solid var(--divider);
+      font-size: 0.8rem; color: var(--text-2); line-height: 1.45;
+    }
+    .touchpoint-row:first-child { border-top: none; }
+    .touchpoint-row--head {
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--text-3); padding: 0.55rem 1.1rem; background: var(--inner-bg);
+    }
+    .tp-existing strong { color: var(--text); font-weight: 700; }
+    .tp-arrow {
+      text-align: center;
+      color: var(--accent); font-weight: 700;
+      font-size: 0.66rem; letter-spacing: 0.04em;
+      padding: 0.18rem 0.45rem;
+      background: rgba(41,151,255,0.08);
+      border: 1px solid rgba(41,151,255,0.22);
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .tp-arrow--bidir {
+      color: var(--a2a); background: rgba(20,184,166,0.08); border-color: rgba(20,184,166,0.24);
+    }
+    .tp-new strong { color: var(--text); font-weight: 700; }
+    .tp-purpose {
+      font-size: 0.74rem; color: var(--text-3); font-style: italic;
+    }
+    @media (max-width: 880px) {
+      .touchpoint-row { grid-template-columns: 1fr; gap: 0.3rem; padding: 0.85rem 1rem; }
+      .touchpoint-row--head { display: none; }
+      .tp-arrow { justify-self: start; }
+    }
+
     /* FOOTER */
     .page-footer {
       max-width: 1440px; margin: 0 auto;
@@ -655,13 +777,13 @@
           <span class="zone__brand"><span class="accent">SAP</span> Applications</span>
         </div>
         <div class="app-stack">
-          <div class="app-pill">SAP S/4HANA</div>
-          <div class="app-pill">SAP aATP</div>
-          <div class="app-pill">SAP MDG · RFM</div>
-          <div class="app-pill">SAP Ariba</div>
-          <div class="app-pill is-faded">SAP CAR</div>
-          <div class="app-pill is-faded">SAP Concur</div>
-          <div class="app-pill is-faded">SAP SuccessFactors</div>
+          <div class="app-pill"><span class="app-pill__name">SAP S/4HANA<small>RISE on AWS</small></span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
+          <div class="app-pill"><span class="app-pill__name">SAP aATP<small>config required</small></span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
+          <div class="app-pill"><span class="app-pill__name">SAP MDG · RFM</span><span class="status-badge status-badge--new"><span class="dot"></span>New</span></div>
+          <div class="app-pill"><span class="app-pill__name">SAP Ariba</span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
+          <div class="app-pill"><span class="app-pill__name">SAP CAR<small>retail POS feed</small></span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
+          <div class="app-pill is-faded"><span class="app-pill__name">SAP Concur</span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
+          <div class="app-pill is-faded"><span class="app-pill__name">SAP SuccessFactors</span><span class="status-badge status-badge--deployed"><span class="dot"></span>Deployed</span></div>
         </div>
       </div>
 
@@ -681,6 +803,7 @@
                 <div class="panel__title">Joule</div>
                 <div class="panel__sub">Agent Builder</div>
               </div>
+              <span class="status-badge status-badge--new"><span class="dot"></span>New</span>
             </div>
             <div class="panel__body">
               <div class="pill pill--custom">Commercial Experience Agent</div>
@@ -697,6 +820,7 @@
                 <div class="panel__title">Agent Catalog</div>
                 <div class="panel__sub">CAP Application</div>
               </div>
+              <span class="status-badge status-badge--new"><span class="dot"></span>New</span>
             </div>
             <div class="panel__body">
 
@@ -722,6 +846,7 @@
                 <div class="panel__title">Agent Connector</div>
                 <div class="panel__sub">CAP Application · ORD &amp; A2A Server</div>
               </div>
+              <span class="status-badge status-badge--new"><span class="dot"></span>New</span>
             </div>
           </div>
 
@@ -744,6 +869,7 @@
         <div class="zone__head">
           <div class="cloud-logo azure">⊞</div>
           <span class="zone__brand"><span class="azure">Microsoft Azure</span></span>
+          <span class="status-badge status-badge--new"><span class="dot"></span>New</span>
         </div>
         <div class="cloud-panels">
           <div class="cloud-panel cloud-panel--azure-cat">
@@ -774,6 +900,7 @@
         <div class="zone__head">
           <div class="cloud-logo gcp">G</div>
           <span class="zone__brand"><span class="gcp">Google Cloud</span></span>
+          <span class="status-badge status-badge--future"><span class="dot"></span>Future</span>
         </div>
         <div class="cloud-panels">
           <div class="cloud-panel cloud-panel--gcp-cat">
@@ -799,7 +926,8 @@
       <div class="zone zone--aws">
         <div class="zone__head">
           <div class="cloud-logo aws">a</div>
-          <span class="zone__brand"><span class="aws">AWS</span></span>
+          <span class="zone__brand"><span class="aws">AWS Bedrock</span> <span style="font-size:0.6rem;color:var(--text-3);font-style:italic;font-weight:500;">(SAP RISE host today)</span></span>
+          <span class="status-badge status-badge--future"><span class="dot"></span>Future</span>
         </div>
         <div class="cloud-panels">
           <div class="cloud-panel cloud-panel--aws-cat">
@@ -848,8 +976,162 @@
       </div>
 
     </div>
+  </section>
 
-    <!-- LAYER MAPPING TABLE -->
+  <!-- LANDSCAPE FIT — How this fits the customer's existing stack -->
+  <section class="landscape-fit-wrap">
+    <div class="landscape-fit-head">
+      <h2>How this fits your existing landscape</h2>
+      <p>The agent fabric augments your current SAP-RISE-on-AWS + BTP + multi-cloud stack — it doesn't replace anything. Here's what stays and what's net-new.</p>
+    </div>
+
+    <div class="landscape-grid">
+
+      <div class="landscape-col landscape-col--existing">
+        <div class="landscape-col__head">
+          <span class="landscape-col__icon">✓</span>
+          <span class="landscape-col__title">Already in your stack</span>
+          <span class="landscape-col__sub">stays as-is</span>
+        </div>
+        <div class="landscape-list">
+          <div class="landscape-item"><strong>SAP S/4HANA</strong> on AWS via RISE <small>system of record</small></div>
+          <div class="landscape-item"><strong>SAP aATP</strong> module <small>configuration required for OTC scenarios</small></div>
+          <div class="landscape-item"><strong>SAP CAR</strong> <small>retail POS feed for markdown insights</small></div>
+          <div class="landscape-item"><strong>SAP Cloud Connector</strong> <small>secure tunnel from BTP to S/4</small></div>
+          <div class="landscape-item"><strong>SAP BTP Integration Suite</strong> <small>event mesh + EDI routing</small></div>
+          <div class="landscape-item"><strong>SAP IAS + IAG</strong> <small>identity + governance — the trust boundary</small></div>
+          <div class="landscape-item"><strong>SAP Ariba</strong> <small>supplier POs (e.g. expedited fabric lots)</small></div>
+          <div class="landscape-item"><strong>SAP Fiori, BAS, Cloud ALM, Forms</strong> <small>BTP foundation services</small></div>
+          <div class="landscape-item"><strong>SPS Commerce</strong> <small>retailer EDI on-ramp (850 / 856 / 812 / 860)</small></div>
+          <div class="landscape-item"><strong>OpenText Archive</strong> <small>audit-ledger storage for VAS condition changes</small></div>
+          <div class="landscape-item"><strong>Vertex (CCH)</strong> <small>tax + pricing engine</small></div>
+          <div class="landscape-item"><strong>Paymetric</strong> <small>payments + cash application</small></div>
+          <div class="landscape-item"><strong>Experian</strong> <small>customer credit data for sales-order completion</small></div>
+          <div class="landscape-item"><strong>BMC Control-M</strong> <small>workload automation</small></div>
+          <div class="landscape-item"><strong>Snowflake</strong> <small>analytical data warehouse</small></div>
+        </div>
+      </div>
+
+      <div class="landscape-col landscape-col--new">
+        <div class="landscape-col__head">
+          <span class="landscape-col__icon">+</span>
+          <span class="landscape-col__title">What this initiative adds</span>
+          <span class="landscape-col__sub">net-new components</span>
+        </div>
+        <div class="landscape-list">
+          <div class="landscape-item"><strong>Joule + Agent Builder</strong> on BTP <small>runtime for orchestration agents</small></div>
+          <div class="landscape-item"><strong>Agent Catalog</strong> (CAP application) <small>ORD aggregator + A2A router</small></div>
+          <div class="landscape-item"><strong>Agent Connector</strong> (CAP application) <small>ORD &amp; A2A server endpoints</small></div>
+          <div class="landscape-item"><strong>SAP MDG · RFM</strong> <small>retail master-data governance — recommended addition</small></div>
+          <div class="landscape-item"><strong>Configured aATP capabilities</strong> <small>PAC, ABC, BOP, Supply Protection, Product Allocation, Season Mgmt, VAS conditions</small></div>
+          <div class="landscape-item"><strong>Microsoft Azure AI Foundry</strong> <small>Copilot Studio + Azure OpenAI agents</small></div>
+          <div class="landscape-item"><strong>Microsoft Fabric</strong> <small>complements Snowflake — supplier-mill telemetry, retailer POS, weather/demand ML</small></div>
+          <div class="landscape-item"><strong>Dynamics 365</strong> <small>retailer-360 + buyer context for proactive comms</small></div>
+          <div class="landscape-item"><strong>Power Automate</strong> <small>workflow + retailer-portal dispute submission</small></div>
+          <div class="landscape-item"><strong>Microsoft Teams + Outlook</strong> <small>human-in-the-loop surfaces (channels, approvals)</small></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOUCH POINTS — where new meets existing -->
+  <section class="touchpoints-wrap">
+    <div class="touchpoints-head">
+      <h2>Touch points · where the agent fabric meets your stack</h2>
+      <p>Every new component integrates with something you already run. No rip-and-replace.</p>
+    </div>
+
+    <div class="touchpoint-table">
+      <div class="touchpoint-row touchpoint-row--head">
+        <span>Existing component</span>
+        <span style="text-align:center;">Direction</span>
+        <span>New component</span>
+        <span>Purpose</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>SPS Commerce</strong></span>
+        <span class="tp-arrow">→ EDI</span>
+        <span class="tp-new"><strong>BTP Event Mesh → Stock Protection / VAS agent</strong></span>
+        <span class="tp-purpose">EDI 850 / 856 / 860 / 812 land in BTP and trigger the right agent — same path as today, just routed to Joule.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>SAP CAR</strong></span>
+        <span class="tp-arrow">→ POS feed</span>
+        <span class="tp-new"><strong>MS Fabric · Markdown-Pressure ML</strong></span>
+        <span class="tp-purpose">Sell-through telemetry from CAR feeds Fabric's regional markdown-risk model.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>OpenText Archive</strong></span>
+        <span class="tp-arrow tp-arrow--bidir">↔ Audit</span>
+        <span class="tp-new"><strong>VAS Re-determination · Audit Ledger</strong></span>
+        <span class="tp-purpose">Every condition-record change posts to OpenText with reason code — it's already your immutable archive.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>Vertex (CCH)</strong></span>
+        <span class="tp-arrow">→ Pricing</span>
+        <span class="tp-new"><strong>AI Pricing Data Prep agent</strong></span>
+        <span class="tp-purpose">Agent feeds clean, deduped pricing condition records into Vertex / S/4 — Vertex remains the tax-and-price calc engine.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>Paymetric</strong></span>
+        <span class="tp-arrow">→ Cash</span>
+        <span class="tp-new"><strong>POD Capture → Auto-Billing agent</strong></span>
+        <span class="tp-purpose">POD attaches to invoice; agent releases billing in S/4; Paymetric posts the cash. Faster invoice-to-cash, same Paymetric.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>Experian</strong></span>
+        <span class="tp-arrow">→ Credit</span>
+        <span class="tp-new"><strong>Sales-Order Completion agent</strong></span>
+        <span class="tp-purpose">Agent calls Experian to fill missing credit/terms fields when an order arrives incomplete.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>SAP Ariba</strong></span>
+        <span class="tp-arrow">→ Supplier PO</span>
+        <span class="tp-new"><strong>Stock Protection agent</strong></span>
+        <span class="tp-purpose">When ABC requires expedited fabric (e.g. Portugal mill), the agent raises an Ariba PO within pre-approved supplier + price guardrails.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>Snowflake</strong></span>
+        <span class="tp-arrow tp-arrow--bidir">↔ Data</span>
+        <span class="tp-new"><strong>MS Fabric (peer data layer)</strong></span>
+        <span class="tp-purpose">Snowflake remains your enterprise warehouse; Fabric is the ML-and-event-stream tier feeding agents in real time. They share data via OneLake / Snowflake connectors.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>SAP Cloud Connector</strong></span>
+        <span class="tp-arrow tp-arrow--bidir">↔ Tunnel</span>
+        <span class="tp-new"><strong>Joule · Agent Builder</strong></span>
+        <span class="tp-purpose">Joule reaches S/4 + aATP through your existing Cloud Connector — no new ingress.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>SAP IAS + IAG</strong></span>
+        <span class="tp-arrow tp-arrow--bidir">↔ Trust</span>
+        <span class="tp-new"><strong>Agent Catalog · Trust boundary</strong></span>
+        <span class="tp-purpose">Federated identity across BTP, Microsoft Azure, SPS, Snowflake — same IAS/IAG that already governs your BTP estate.</span>
+      </div>
+
+      <div class="touchpoint-row">
+        <span class="tp-existing"><strong>BMC Control-M</strong></span>
+        <span class="tp-arrow">→ Workflow</span>
+        <span class="tp-new"><strong>Power Automate</strong></span>
+        <span class="tp-purpose">Power Automate handles agent-initiated workflows; long-running batch jobs continue under Control-M. Coexistence, not replacement.</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LAYER MAPPING TABLE wrapper -->
+  <section class="legend-wrap" style="padding-top: 0.4rem;">
     <div class="layer-table">
 
       <div class="layer-table__row">
