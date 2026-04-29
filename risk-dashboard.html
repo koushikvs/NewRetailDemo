@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commercial Agent — Retail Risk Intelligence Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --panel: #1c1c1e;
+      --panel-2: #2c2c2e;
+      --border: rgba(255,255,255,0.1);
+      --border-h: rgba(255,255,255,0.18);
+      --accent: #2997ff;
+      --accent-2: #5ac8fa;
+      --good: #30d158;
+      --watch: #ff9f0a;
+      --red: #ff453a;
+      --text: #f5f5f7;
+      --text-2: #a1a1a6;
+      --text-3: #6e6e73;
+      --hdr-bg: rgba(0,0,0,0.8);
+      --ms-blue: #0078D4;
+      --ms-teal: #00B7C3;
+      --ms-purple: #8661C5;
+      --ms-magenta: #B4009E;
+      --ms-indigo: #6264A7;
+    }
+    [data-theme="light"] {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --panel: #ffffff;
+      --panel-2: #f5f5f7;
+      --border: rgba(0,0,0,0.1);
+      --border-h: rgba(0,0,0,0.18);
+      --accent: #0071e3;
+      --accent-2: #0077ed;
+      --text: #1d1d1f;
+      --text-2: #6e6e73;
+      --text-3: #86868b;
+      --hdr-bg: rgba(245,245,247,0.85);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      font-size: 14px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* HEADER */
+    .page-header {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 22px; height: 44px;
+      background: var(--hdr-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border); gap: 1rem;
+    }
+    .page-header__left { display: flex; align-items: center; gap: 0.7rem; flex-shrink: 0; }
+    .brand-wordmark { font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+    .brand-wordmark a { color: inherit; text-decoration: none; }
+    .header-divider { width: 1px; height: 16px; background: var(--border); }
+    .product-label { font-size: 0.74rem; font-weight: 500; color: var(--text-2); letter-spacing: -0.005em; }
+    .page-nav { display: flex; gap: 0.08rem; overflow-x: auto; }
+    .page-nav__link {
+      font-size: 0.72rem; font-weight: 400; color: var(--text-3);
+      text-decoration: none; padding: 0.24rem 0.55rem;
+      border-radius: 980px; white-space: nowrap;
+      transition: color 0.24s cubic-bezier(.4,0,.6,1), background 0.24s cubic-bezier(.4,0,.6,1);
+      letter-spacing: -0.01em;
+    }
+    .page-nav__link:hover { color: var(--text); background: rgba(255,255,255,0.08); }
+    .page-nav__link.is-active { color: var(--accent); background: rgba(41,151,255,0.1); }
+    .header-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+    .risk-filter select {
+      background: var(--panel); border: 1px solid var(--border);
+      color: var(--text-2); padding: 0.26rem 0.55rem;
+      border-radius: 980px; font-size: 0.72rem;
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif; cursor: pointer; outline: none;
+    }
+    .cockpit-link {
+      font-size: 0.72rem; font-weight: 400; color: var(--accent);
+      text-decoration: none; padding: 0.26rem 0.6rem;
+      border: 1px solid rgba(41,151,255,0.3); border-radius: 980px;
+      transition: background 0.2s; letter-spacing: -0.01em;
+    }
+    .cockpit-link:hover { background: rgba(41,151,255,0.1); }
+    .theme-toggle {
+      background: transparent; border: none;
+      border-radius: 980px; padding: 0.26rem 0.5rem;
+      cursor: pointer; font-size: 0.78rem; color: var(--accent);
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif; transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(41,151,255,0.1); }
+    .theme-icon--light { display: none; }
+    [data-theme="light"] .theme-icon--dark  { display: none; }
+    [data-theme="light"] .theme-icon--light { display: inline; }
+
+    /* ALERT BANNER */
+    .alert-banner {
+      background: rgba(239,68,68,0.08);
+      border-bottom: 1px solid rgba(239,68,68,0.22);
+      padding: 0.55rem 1.4rem;
+    }
+    .alert-banner__inner {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.8rem; color: #fca5a5;
+      max-width: 1440px; margin: 0 auto;
+    }
+    .alert-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); flex-shrink: 0; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+    .alert-dismiss { margin-left: auto; background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 1rem; padding: 0 0.2rem; line-height: 1; }
+
+    /* HERO */
+    .dash-hero {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.3rem 1.4rem 0.9rem;
+      max-width: 1440px; margin: 0 auto; gap: 1.5rem;
+    }
+    .dash-eyebrow {
+      display: block; font-size: 0.67rem; font-weight: 700;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--accent-2); margin-bottom: 0.35rem;
+    }
+    .dash-hero__left h1 { font-size: 1.75rem; font-weight: 900; letter-spacing: -0.03em; color: var(--text); }
+    .dash-hero__left p { font-size: 0.82rem; color: var(--text-2); margin-top: 0.25rem; }
+    .dash-hero__right { display: flex; gap: 0.85rem; flex-shrink: 0; flex-wrap: wrap; }
+    .hero-kpi {
+      text-align: center; padding: 0.7rem 1rem;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; min-width: 118px;
+    }
+    .hero-kpi__label { display: block; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 0.28rem; }
+    .hero-kpi__value {
+      display: block; font-size: 1.45rem; font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #2997ff, #5ac8fa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* KPI ROW */
+    .kpi-row { display: flex; gap: 0.8rem; padding: 0 1.4rem 0.9rem; max-width: 1440px; margin: 0 auto; overflow-x: auto; }
+    .kpi-card {
+      flex: 1; min-width: 148px;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 0.9rem 1rem;
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover { border-color: rgba(99,102,241,0.3); box-shadow: 0 4px 18px rgba(99,102,241,0.08); }
+    .kpi-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 2px; }
+    .kpi-data { display: flex; flex-direction: column; gap: 0.18rem; }
+    .kpi-label { font-size: 0.68rem; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .kpi-value { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; color: var(--text); line-height: 1.1; }
+    .kpi-value small { font-size: 0.85rem; font-weight: 600; color: var(--text-2); }
+    .kpi-delta { font-size: 0.68rem; font-weight: 600; }
+    .kpi-delta--good  { color: var(--good); }
+    .kpi-delta--watch { color: var(--watch); }
+    .kpi-delta--bad   { color: var(--red); }
+
+    /* GRID */
+    .dash-grid {
+      display: grid; grid-template-columns: 1.12fr 1fr;
+      gap: 0.9rem; padding: 0 1.4rem 2rem;
+      max-width: 1440px; margin: 0 auto;
+    }
+    .dash-col-left, .dash-col-right { display: flex; flex-direction: column; gap: 0.9rem; }
+
+    /* PANELS */
+    .dash-panel {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; transition: border-color 0.2s;
+    }
+    .dash-panel--ai   { border-color: rgba(134,97,197,0.22); }
+    .dash-panel--feed { border-color: rgba(0,183,195,0.18); }
+    .panel-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 0.95rem 1.15rem 0.7rem; gap: 0.75rem;
+    }
+    .panel-head h3 { font-size: 0.87rem; font-weight: 700; color: var(--text); margin-bottom: 0.12rem; }
+    .panel-head p { font-size: 0.73rem; color: var(--text-3); }
+    .ai-badge {
+      font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.52rem;
+      border-radius: 100px; background: rgba(134,97,197,0.14);
+      color: #c9a8ff; border: 1px solid rgba(134,97,197,0.3); flex-shrink: 0;
+    }
+    .live-badge { display: flex; align-items: center; gap: 5px; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; color: var(--good); flex-shrink: 0; }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); animation: blink 1.2s infinite; }
+    .alert-count-badge { font-size: 0.66rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 100px; background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.22); flex-shrink: 0; }
+    .map-legend { display: flex; align-items: center; gap: 0.55rem; font-size: 0.68rem; color: var(--text-3); flex-wrap: wrap; }
+    .map-legend-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+    #locationMap { margin: 0 1.15rem 1.15rem; border-radius: 10px; overflow: hidden; height: 296px; }
+    .leaflet-container { background: #0a0f1e !important; }
+    .leaflet-tile-pane { filter: brightness(0.85) saturate(0.7); }
+
+    .chart-container { padding: 0 1.15rem 1.15rem; }
+
+    /* HEATMAP */
+    .heatmap-wrap { padding: 0 1.15rem 1.15rem; }
+    .heatmap-grid { display: grid; grid-template-columns: 32px repeat(6, 1fr); gap: 3px; }
+    .heatmap-label { display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; font-size: 9.5px; color: var(--text-3); font-weight: 600; }
+    .heatmap-col-label { text-align: center; padding: 3px 2px; font-size: 9px; color: var(--text-3); font-weight: 500; }
+    .heatmap-cell { height: 26px; border-radius: 4px; cursor: default; transition: transform 0.15s, filter 0.15s; position: relative; }
+    .heatmap-cell:hover { transform: scale(1.12); filter: brightness(1.25); z-index: 2; }
+
+    /* AI INSIGHTS */
+    .ai-insights { padding: 0 1.15rem 1.15rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .ai-insight {
+      padding: 0.85rem 0.95rem; border-radius: 10px;
+      border-left: 3px solid; display: flex; gap: 0.7rem;
+      font-size: 0.78rem; line-height: 1.57;
+    }
+    .ai-insight--critical { background: rgba(239,68,68,0.06); border-left-color: var(--red); }
+    .ai-insight--watch    { background: rgba(245,158,11,0.06); border-left-color: var(--watch); }
+    .ai-insight--good     { background: rgba(16,185,129,0.06); border-left-color: var(--good); }
+    .ai-insight__icon { font-size: 1.05rem; flex-shrink: 0; margin-top: 1px; }
+    .ai-insight strong { color: var(--text); display: block; margin-bottom: 3px; font-size: 0.8rem; }
+    .ai-insight__evidence { color: var(--text-2); margin-bottom: 3px; }
+    .ai-insight__quote { font-style: italic; color: var(--text-3); font-size: 0.73rem; padding: 4px 8px; border-left: 2px solid var(--border); margin: 4px 0; }
+    .ai-insight__footer { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-top: 5px; }
+    .ai-insight__badge { font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 100px; }
+    .ai-insight__badge--critical { background: rgba(239,68,68,0.15); color: #fca5a5; }
+    .ai-insight__badge--watch { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .ai-insight__badge--good { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .ai-insight__source { font-size: 0.66rem; color: var(--text-3); }
+    .ai-insight__link { font-size: 0.66rem; color: var(--accent); text-decoration: none; font-weight: 600; margin-left: auto; }
+    .ai-insight__link:hover { text-decoration: underline; }
+
+    /* ALERT CENTER */
+    .alert-list { padding: 0 1.15rem 1.15rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .alert-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.7rem 0.85rem; border-radius: 10px;
+      border: 1px solid var(--border); gap: 0.7rem; font-size: 0.78rem;
+      transition: border-color 0.2s;
+    }
+    .alert-item--critical { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); }
+    .alert-item--high { background: rgba(245,158,11,0.04); border-color: rgba(245,158,11,0.18); }
+    .alert-item--medium { background: rgba(99,102,241,0.04); border-color: rgba(99,102,241,0.14); }
+    .alert-item__left { display: flex; align-items: flex-start; gap: 0.58rem; flex: 1; min-width: 0; }
+    .alert-severity { font-size: 0.58rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; letter-spacing: 0.04em; flex-shrink: 0; margin-top: 2px; }
+    .alert-severity--critical { background: rgba(239,68,68,0.2); color: #f87171; }
+    .alert-severity--high { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .alert-severity--medium { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+    .alert-item strong { color: var(--text); font-size: 0.78rem; display: block; }
+    .alert-item p { color: var(--text-2); font-size: 0.72rem; margin-top: 1px; }
+    .alert-item small { color: var(--text-3); font-size: 0.66rem; }
+    .alert-action {
+      flex-shrink: 0; font-size: 0.7rem; font-weight: 600;
+      padding: 0.28rem 0.7rem; border-radius: 7px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      color: var(--text-2); cursor: pointer; text-decoration: none;
+      white-space: nowrap; font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .alert-action:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+
+    /* LIVE FEED */
+    .feed-list { padding: 0 1.15rem 1.15rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .feed-item {
+      padding: 0.7rem 0.82rem; background: rgba(255,255,255,0.022);
+      border: 1px solid var(--border); border-radius: 10px;
+      font-size: 0.77rem; line-height: 1.52;
+      transition: border-color 0.2s;
+    }
+    .feed-item:hover { border-color: var(--border-h); }
+    .feed-item__header { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 3px; }
+    .feed-item__header strong { color: var(--text); font-size: 0.78rem; }
+    .feed-item p { color: var(--text-2); }
+    .feed-item__meta { display: flex; gap: 0.7rem; margin-top: 4px; font-size: 0.66rem; color: var(--text-3); }
+    .feed-pill { font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 100px; margin-left: auto; flex-shrink: 0; }
+    .feed-pill--critical { background: rgba(239,68,68,0.14); color: #f87171; }
+    .feed-pill--watch { background: rgba(245,158,11,0.14); color: #fcd34d; }
+    .feed-pill--good { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+    .feed-pill--resolved { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+
+    /* ORDER ACTIVITY */
+    .order-activity { padding: 0 1.15rem 1.15rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .order-card {
+      padding: 0.8rem 0.85rem; border-radius: 10px;
+      border: 1px solid var(--border); position: relative;
+      overflow: hidden; font-size: 0.76rem;
+      background: rgba(255,255,255,0.018);
+      transition: border-color 0.2s;
+    }
+    .order-card:hover { border-color: var(--border-h); }
+    .order-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .order-card--good::before  { background: var(--good); }
+    .order-card--watch::before { background: var(--watch); }
+    .order-card--bad::before   { background: var(--red); }
+    .order-card__id { font-size: 0.63rem; font-family: 'JetBrains Mono', monospace; color: var(--text-3); margin-bottom: 3px; display: block; }
+    .order-card__customer { font-weight: 700; color: var(--text); font-size: 0.78rem; display: block; }
+    .order-card__desc { font-size: 0.71rem; color: var(--text-2); margin-top: 3px; line-height: 1.45; }
+    .order-card__sys { display: flex; gap: 4px; margin-top: 6px; }
+    .sys-tag { font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 3px; color: white; }
+    .sys-tag.s4   { background: #0A6ED1; }
+    .sys-tag.btp  { background: #bf8afc; }
+    .sys-tag.fab  { background: #00B7C3; }
+    .sys-tag.d365 { background: #0078D4; }
+    .sys-tag.co   { background: #8661C5; }
+    .sys-tag.pa   { background: #B4009E; }
+    .order-card__badge { display: inline-block; font-size: 0.58rem; font-weight: 700; padding: 2px 5px; border-radius: 4px; margin-top: 5px; }
+    .order-card--good  .order-card__badge { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+    .order-card--watch .order-card__badge { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .order-card--bad   .order-card__badge { background: rgba(239,68,68,0.15); color: #f87171; }
+    .order-card__time { position: absolute; bottom: 5px; right: 8px; font-size: 0.6rem; color: var(--text-3); }
+
+    /* CUSTOMER HEALTH */
+    .location-list { padding: 0 1.15rem 1.15rem; }
+    .loc-row { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+    .loc-row:last-child { border-bottom: none; }
+    .loc-rank { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.66rem; font-weight: 800; flex-shrink: 0; }
+    .loc-rank--top    { background: rgba(16,185,129,0.14); color: #6ee7b7; }
+    .loc-rank--bottom { background: rgba(239,68,68,0.12); color: #f87171; }
+    .loc-info { flex: 1; min-width: 0; }
+    .loc-info strong { color: var(--text); display: block; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .loc-info span { color: var(--text-3); font-size: 0.68rem; }
+    .loc-score { font-size: 1rem; font-weight: 900; letter-spacing: -0.02em; flex-shrink: 0; }
+    .loc-score--good { color: var(--good); }
+    .loc-score--watch { color: var(--watch); }
+    .loc-score--bad { color: var(--red); }
+    .loc-divider { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0; color: var(--text-3); font-size: 0.68rem; font-weight: 600; }
+    .loc-divider::before, .loc-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* AATP */
+    .aatp-engine { padding: 0 1.15rem 1.15rem; }
+    .aatp-engine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+    .aatp-stat {
+      padding: 0.7rem 0.85rem; border-radius: 10px;
+      border: 1px solid rgba(10,110,209,0.18);
+      background: rgba(10,110,209,0.04);
+    }
+    .aatp-stat__label { font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #60a5fa; margin-bottom: 0.3rem; display: block; }
+    .aatp-stat__value { font-size: 1.15rem; font-weight: 900; letter-spacing: -0.02em; color: var(--text); line-height: 1.1; }
+    .aatp-stat__value small { font-size: 0.78rem; font-weight: 600; color: var(--text-2); }
+    .aatp-stat__delta { font-size: 0.67rem; font-weight: 600; color: var(--good); margin-top: 2px; display: block; }
+    .aatp-stat__delta--watch { color: var(--watch); }
+    .aatp-run-row { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.76rem; }
+    .aatp-run-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .aatp-run-label { color: var(--text-2); }
+    .aatp-run-value { font-weight: 700; color: var(--text); }
+    .aatp-run-badge { font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 100px; }
+    .aatp-run-badge--good { background: rgba(16,185,129,0.14); color: #6ee7b7; }
+    .aatp-run-badge--watch { background: rgba(245,158,11,0.14); color: #fcd34d; }
+
+    /* FOOTER */
+    .page-footer { border-top: 1px solid var(--border); padding: 0.9rem 1.4rem; max-width: 1440px; margin: 0 auto; }
+    .footer-nav { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.45rem; }
+    .footer-link { font-size: 0.72rem; color: var(--text-3); text-decoration: none; padding: 0.2rem 0.45rem; border-radius: 5px; transition: color 0.2s; }
+    .footer-link:hover { color: var(--text); }
+    .footer-link.is-active { color: var(--accent); }
+    .footer-copy { font-size: 0.7rem; color: var(--text-3); }
+
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .feed-item-new { animation: fadeInUp 0.45s ease forwards; }
+
+    /* USE-CASE INVENTORY */
+    .usecase-inventory { max-width: 1440px; margin: 0 auto; padding: 0 1.4rem 1.2rem; }
+    .ui-head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 0.7rem; gap: 1rem; flex-wrap: wrap;
+    }
+    .ui-head h2 {
+      font-size: 0.92rem; font-weight: 700; color: var(--text); letter-spacing: -0.005em;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .ui-head__sub { font-size: 0.74rem; color: var(--text-3); }
+    .ui-head a { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 0.75rem; }
+    .ui-head a:hover { text-decoration: underline; }
+    .ui-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.55rem;
+    }
+    .ui-tile {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.7rem 0.85rem;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; gap: 0.32rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .ui-tile:hover { border-color: rgba(41,151,255,0.32); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.28); }
+    .ui-tile__head { display: flex; align-items: center; gap: 0.42rem; }
+    .ui-tile__icon { font-size: 0.95rem; flex-shrink: 0; }
+    .ui-tile__name { font-size: 0.74rem; font-weight: 700; flex: 1; line-height: 1.2; color: var(--text); }
+    .ui-pill {
+      font-size: 0.52rem; font-weight: 800; padding: 1px 5px; border-radius: 100px;
+      letter-spacing: 0.05em; text-transform: uppercase; flex-shrink: 0;
+    }
+    .ui-pill--live  { background: rgba(48,209,88,0.13); color: #6ee7b7; border: 1px solid rgba(48,209,88,0.3); }
+    .ui-pill--pilot { background: rgba(255,159,10,0.12); color: #fcd34d; border: 1px solid rgba(255,159,10,0.3); }
+    .ui-tile__metric { font-size: 0.7rem; color: var(--text-2); font-weight: 600; }
+    .ui-tile__impact { font-size: 0.66rem; color: var(--good); font-weight: 600; }
+
+    @media (max-width: 1050px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .dash-hero { flex-direction: column; align-items: flex-start; }
+      .page-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="page-header__left">
+      <div class="brand-wordmark"><a href="index.html">Lean Core</a></div>
+      <span class="header-divider"></span>
+      <span class="product-label">Commercial Risk Dashboard · Retail & Fashion</span>
+    </div>
+    <nav class="page-nav">
+      <a class="page-nav__link" href="use-cases.html">AI Use Cases</a>
+      <a class="page-nav__link is-active" href="risk-dashboard.html">Risk Dashboard</a>
+      <a class="page-nav__link" href="#">Architecture</a>
+      <a class="page-nav__link" href="#">System Health</a>
+    </nav>
+    <div class="header-actions">
+      <div class="risk-filter">
+        <select id="riskFilter" onchange="filterByRisk(this.value)">
+          <option value="all">All Risk Types</option>
+          <option value="supply">Supplier Delay</option>
+          <option value="carrier">Carrier Failure</option>
+          <option value="atp">ATP Shortfall</option>
+          <option value="chargeback">Chargeback / Deduction</option>
+          <option value="markdown">Markdown Pressure</option>
+          <option value="edi">EDI Error</option>
+        </select>
+      </div>
+      <a class="cockpit-link" href="#">CFO Cockpit →</a>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="theme-icon theme-icon--dark">🌙</span>
+        <span class="theme-icon theme-icon--light">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="alert-banner" id="alertBanner">
+    <div class="alert-banner__inner">
+      <span class="alert-dot"></span>
+      <strong>🚨 Active Risk:</strong>&nbsp;
+      Metro Retail Group PO-67412 — Peru cotton mill delay on Summit Fall pre-book. Commercial Agent is responding autonomously across aATP, Dynamics 365, and Power Automate.
+      <button class="alert-dismiss" onclick="document.getElementById('alertBanner').style.display='none'">✕</button>
+    </div>
+  </div>
+
+  <section class="dash-hero">
+    <div class="dash-hero__left">
+      <span class="dash-eyebrow">Signal Hub · Meridian Athletic Co.</span>
+      <h1>Wholesale Commercial Risk Intelligence</h1>
+      <p>Real-time PO monitoring across 1,847 open POs · 68 wholesale accounts · 24 countries · $421M in-flight</p>
+    </div>
+    <div class="dash-hero__right">
+      <div class="hero-kpi">
+        <span class="hero-kpi__label">Open POs</span>
+        <span class="hero-kpi__value" data-count="1847">0</span>
+      </div>
+      <div class="hero-kpi">
+        <span class="hero-kpi__label">Revenue at Risk</span>
+        <span class="hero-kpi__value" data-count="14.2" data-suffix="M" data-prefix="$">$0</span>
+      </div>
+      <div class="hero-kpi">
+        <span class="hero-kpi__label">Chargebacks Avoided MTD</span>
+        <span class="hero-kpi__value" data-count="2.8" data-suffix="M" data-prefix="$">$0</span>
+      </div>
+      <div class="hero-kpi">
+        <span class="hero-kpi__label">Auto-Resolved</span>
+        <span class="hero-kpi__value" data-count="68">0</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-data">
+        <span class="kpi-label">OTIF Rate</span>
+        <span class="kpi-value">96.1<small>%</small></span>
+        <span class="kpi-delta kpi-delta--good">↑ 0.8% vs last month</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🧵</div>
+      <div class="kpi-data">
+        <span class="kpi-label">Fill Rate</span>
+        <span class="kpi-value">97.4<small>%</small></span>
+        <span class="kpi-delta kpi-delta--good">↑ 1.3% vs plan</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⭐</div>
+      <div class="kpi-data">
+        <span class="kpi-label">Retailer Scorecard (avg)</span>
+        <span class="kpi-value">94.2</span>
+        <span class="kpi-delta kpi-delta--good">↑ 0.6 vs Q4</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🍂</div>
+      <div class="kpi-data">
+        <span class="kpi-label">Fall '26 Season Readiness</span>
+        <span class="kpi-value">88<small>%</small></span>
+        <span class="kpi-delta kpi-delta--watch">Peru cotton on watch</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🎯</div>
+      <div class="kpi-data">
+        <span class="kpi-label">aATP PAC Accuracy</span>
+        <span class="kpi-value">98.4<small>%</small></span>
+        <span class="kpi-delta kpi-delta--good">↑ 0.5% vs last week</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🔀</div>
+      <div class="kpi-data">
+        <span class="kpi-label">aATP ABC Hit Rate</span>
+        <span class="kpi-value">91<small>%</small></span>
+        <span class="kpi-delta kpi-delta--good">Alt found without human</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-data">
+        <span class="kpi-label">Margin Leakage Recovered</span>
+        <span class="kpi-value">$4.1<small>M</small></span>
+        <span class="kpi-delta kpi-delta--good">YTD · autonomous</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ USE-CASE INVENTORY ═══ -->
+  <section class="usecase-inventory">
+    <div class="ui-head">
+      <div>
+        <h2>🤖 AI Use-Case Inventory</h2>
+        <p class="ui-head__sub">Seven AI capabilities embedded across the wholesale OTC flow — live, in pilot, or planned.</p>
+      </div>
+      <a href="use-cases.html">See the full catalog →</a>
+    </div>
+    <div class="ui-grid">
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">📦</span>
+          <span class="ui-tile__name">Prepack Auto-Selection</span>
+          <span class="ui-pill ui-pill--live">Live</span>
+        </div>
+        <div class="ui-tile__metric">14,200 orders / mo</div>
+        <div class="ui-tile__impact">5 min → 30 sec entry</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">📝</span>
+          <span class="ui-tile__name">Sales-Order Completion</span>
+          <span class="ui-pill ui-pill--live">Live</span>
+        </div>
+        <div class="ui-tile__metric">8,100 orders / mo</div>
+        <div class="ui-tile__impact">~80% rekey eliminated</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">🏷️</span>
+          <span class="ui-tile__name">VAS Re-determination</span>
+          <span class="ui-pill ui-pill--pilot">Pilot</span>
+        </div>
+        <div class="ui-tile__metric">4,600 changes / mo</div>
+        <div class="ui-tile__impact">95% margin preserved</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html" style="border-color: rgba(41,151,255,0.3);">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">🔍</span>
+          <span class="ui-tile__name">Stock Protection Transparency</span>
+          <span class="ui-pill ui-pill--live">Live</span>
+        </div>
+        <div class="ui-tile__metric">412 partials / mo · <strong style="color:var(--accent-2);">Hero</strong></div>
+        <div class="ui-tile__impact">78% auto-resolved · 4hr → 4min</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">💲</span>
+          <span class="ui-tile__name">AI Pricing Data Prep</span>
+          <span class="ui-pill ui-pill--live">Live</span>
+        </div>
+        <div class="ui-tile__metric">240 cycles / mo</div>
+        <div class="ui-tile__impact">~80% labor saved</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">🔁</span>
+          <span class="ui-tile__name">TPO/PTO Change Feasibility</span>
+          <span class="ui-pill ui-pill--pilot">Pilot</span>
+        </div>
+        <div class="ui-tile__metric">1,830 changes / mo</div>
+        <div class="ui-tile__impact">65% auto-resolved</div>
+      </a>
+
+      <a class="ui-tile" href="use-cases.html">
+        <div class="ui-tile__head">
+          <span class="ui-tile__icon">📷</span>
+          <span class="ui-tile__name">POD Capture → Auto-Billing</span>
+          <span class="ui-pill ui-pill--live">Live</span>
+        </div>
+        <div class="ui-tile__metric">18,400 PODs / mo</div>
+        <div class="ui-tile__impact">1.6 days off DSO</div>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="dash-grid">
+
+    <!-- LEFT -->
+    <div class="dash-col-left">
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>🌍 Global Retailer + Supplier Risk Map</h3>
+            <p>Wholesale accounts, DCs, and upstream mills — colour coded by delivery/supply risk</p>
+          </div>
+          <div class="map-legend">
+            <span class="map-legend-dot" style="background:#10b981"></span> On Track
+            <span class="map-legend-dot" style="background:#f59e0b"></span> At Risk
+            <span class="map-legend-dot" style="background:#ef4444"></span> Critical
+          </div>
+        </div>
+        <div id="locationMap"></div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>Retailer OTIF Performance</h3>
+            <p>OTIF % by wholesale account — green = Tier-1 scorecard, red = needs attention</p>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="accountChart" height="230"></canvas>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>Risk by Category</h3>
+            <p>What the Commercial Agent is resolving most this week — by root cause</p>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="riskChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>PO Risk by Day &amp; Time</h3>
+            <p>Risk-signal intensity by detection window — darker = more disruptions</p>
+          </div>
+        </div>
+        <div class="heatmap-wrap">
+          <div class="heatmap-grid" id="heatmapGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="dash-col-right">
+
+      <div class="dash-panel dash-panel--ai">
+        <div class="panel-head">
+          <div>
+            <h3>🤖 AI Insights</h3>
+            <p>Pattern analysis across 1,847 open POs · Microsoft Fabric + aATP + S/4HANA + Dynamics 365</p>
+          </div>
+          <span class="ai-badge">Copilot + Azure OpenAI</span>
+        </div>
+        <div class="ai-insights" id="aiInsights">
+
+          <div class="ai-insight ai-insight--critical" data-risk="supply">
+            <div class="ai-insight__icon">🧵</div>
+            <div>
+              <strong>Peru Cotton Mill Disruption — $9.4M Pre-Book Exposure</strong>
+              <div class="ai-insight__evidence">
+                12 open POs source from PERU-CAJAMARCA-01. Agent has autonomously re-routed 11 via Rotterdam DC + Portugal fabric + air freight. <b>1 PO (PO-67519)</b> requires Spring '27 buyer sign-off for SKU substitution — pending human review.
+              </div>
+              <div class="ai-insight__quote">"Fabric caught the mill delay 6 days before aATP's scheduled BOP run — because it hadn't touched SAP data yet." — Commercial Agent Log</div>
+              <div class="ai-insight__evidence" style="margin-top:4px;font-weight:600;color:#f87171;">
+                Chargeback exposure on PO-67412 alone: $820K. Autonomous resolution cost premium: $38K.
+              </div>
+              <div class="ai-insight__footer">
+                <span class="ai-insight__badge ai-insight__badge--critical">12 POs</span>
+                <span class="ai-insight__source">MS Fabric · SAP S/4HANA · Last 24 hours</span>
+                <a class="ai-insight__link" href="use-cases.html">See use cases →</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-insight ai-insight--watch" data-risk="chargeback">
+            <div class="ai-insight__icon">💳</div>
+            <div>
+              <strong>Athletic Warehouse Deduction Spike — 78% of claims three-way-match invalid</strong>
+              <div class="ai-insight__evidence">
+                Q1 auto-deductions from Athletic Warehouse up <b>41% vs Q4</b> ($1.12M YTD vs $840K run-rate). Of the last 8 deductions, 6 ($298K) are invalid on three-way match — shipments confirmed on time via aATP PAC + EDI 856 ASN + carrier POD. Agent submitted dispute AW-DISP-22041 via Power Automate.
+              </div>
+              <div class="ai-insight__footer">
+                <span class="ai-insight__badge ai-insight__badge--watch">$298K disputed</span>
+                <span class="ai-insight__source">MS Fabric · aATP · Dynamics 365 · Last 14 days</span>
+                <a class="ai-insight__link" href="use-cases.html">See use cases →</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-insight ai-insight--good" data-risk="positive">
+            <div class="ai-insight__icon">✅</div>
+            <div>
+              <strong>Metro Retail Group — Benchmark Wholesale Partner</strong>
+              <div class="ai-insight__evidence">
+                126 POs over 12 weeks. Scorecard <b>96.4</b>. Zero chargebacks. Proactive communication rate: <b>100%</b>. Fall '26 pre-book on track despite Peru disruption. Recommend anchoring the QBR around this account.
+              </div>
+              <div class="ai-insight__quote">"We've never been told about a supplier issue before we felt it — until this season." — Sarah Kelner, Divisional Merchant, Metro Retail Group</div>
+              <div class="ai-insight__footer">
+                <span class="ai-insight__badge ai-insight__badge--good">126 POs</span>
+                <span class="ai-insight__source">Dynamics 365 · SAP S/4HANA · Last 84 days</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-insight ai-insight--watch" data-risk="markdown">
+            <div class="ai-insight__icon">📉</div>
+            <div>
+              <strong>Markdown Pressure Building — Pacific NW Fleece / Down</strong>
+              <div class="ai-insight__evidence">
+                Unseasonably mild November at <b>Nordic Sports Co.</b> stores (Seattle, Portland). Sell-through on fleece/down programmes <b>-18% vs plan</b>. Fabric POS ingestion flags risk of end-of-season markdown clawback ($1.2M) if no intervention. Agent recommends proactive markdown allowance + regional redistribution to Sun-Belt doors.
+              </div>
+              <div class="ai-insight__footer">
+                <span class="ai-insight__badge ai-insight__badge--watch">Nordic Sports · 34 POs</span>
+                <span class="ai-insight__source">MS Fabric (POS feed) · Dynamics 365 · Last 14 days</span>
+                <a class="ai-insight__link" href="#">Model Intervention →</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-insight ai-insight--watch" data-risk="atp">
+            <div class="ai-insight__icon">⚙️</div>
+            <div>
+              <strong>aATP Engine Health — ABC Hit Rate Dips in EMEA Region</strong>
+              <div class="ai-insight__evidence">
+                aATP's ABC resolved <b>91%</b> of disruptions autonomously this week (14-day avg: 94%). Decline concentrated in EMEA — Rotterdam and Antwerp DCs under simultaneous supply pressure. 2 POs this week escalated because no ABC path was found.
+              </div>
+              <div class="ai-insight__quote">"When aATP ABC has no alternative, the agent escalates — it never guesses. These POs need a human buyer decision on assortment deviation." — Commercial Agent Log</div>
+              <div class="ai-insight__footer">
+                <span class="ai-insight__badge ai-insight__badge--watch">2 escalations</span>
+                <span class="ai-insight__source">aATP ABC Engine · SAP S/4HANA · Last 7 days</span>
+                <a class="ai-insight__link" href="#">Review Escalations →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>🚨 Alert Centre</h3>
+            <p>POs requiring immediate human attention or agent action</p>
+          </div>
+          <span class="alert-count-badge" id="alertCount">3 active</span>
+        </div>
+        <div class="alert-list" id="alertList">
+          <div class="alert-item alert-item--critical" data-risk="supply">
+            <div class="alert-item__left">
+              <div class="alert-severity alert-severity--critical">CRITICAL</div>
+              <div>
+                <strong>Metro Retail Group — PO-67412 · $6.8M</strong>
+                <p>14-day Peru cotton delay. Agent committed Rotterdam + Portugal air-freight plan via aATP ABC.</p>
+                <small>Detected 2 min ago · Agent responding · FLOW-88291 raised</small>
+              </div>
+            </div>
+            <a class="alert-action" href="use-cases.html">View Agent →</a>
+          </div>
+          <div class="alert-item alert-item--high" data-risk="chargeback">
+            <div class="alert-item__left">
+              <div class="alert-severity alert-severity--high">HIGH</div>
+              <div>
+                <strong>Athletic Warehouse — Deduction Cascade · $340K</strong>
+                <p>8 invoices auto-debited. Three-way match flagged 6 as invalid ($298K). Agent drafting dispute via Copilot.</p>
+                <small>9 min ago · Dynamics CASE-42290 · 78% historical win-rate</small>
+              </div>
+            </div>
+            <button class="alert-action" onclick="resolveAlert(this)">Resolve</button>
+          </div>
+          <div class="alert-item alert-item--medium" data-risk="payment">
+            <div class="alert-item__left">
+              <div class="alert-severity alert-severity--medium">MEDIUM</div>
+              <div>
+                <strong>Nordic Sports Co. — PO-66701 · $1.4M</strong>
+                <p>AR payment hold flagged. 48-hr resolution window. Finance team notified via Teams.</p>
+                <small>31 min ago · No OTIF risk for 48h</small>
+              </div>
+            </div>
+            <button class="alert-action" onclick="resolveAlert(this)">Resolve</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-panel dash-panel--feed">
+        <div class="panel-head">
+          <div>
+            <h3>Live Order Event Feed</h3>
+            <p>Real-time Commercial agent actions and PO events</p>
+          </div>
+          <span class="live-badge"><span class="live-dot"></span>LIVE</span>
+        </div>
+        <div class="feed-list" id="feedList">
+          <div class="feed-item" data-risk="supply">
+            <div class="feed-item__header">
+              <strong>aATP ABC Committed — PO-67412 Metro Retail Group</strong>
+              <span class="feed-pill feed-pill--resolved">Resolved</span>
+            </div>
+            <p>aATP ABC confirmed Rotterdam substitution for SUM-FL-21 &amp; SUM-JG-14 (8,400 units). Portugal fabric expedite + air freight raised for SUM-TE-08. BOP reprocessed 11 related POs. Net delay: 7 days vs 14.</p>
+            <div class="feed-item__meta">
+              <span>aATP Agent · S/4HANA</span><span>2 min ago</span><span>⬡ Autonomous</span>
+            </div>
+          </div>
+          <div class="feed-item" data-risk="supply">
+            <div class="feed-item__header">
+              <strong>Buyer Notified — Sarah Kelner, Metro Retail Group</strong>
+              <span class="feed-pill feed-pill--good">Good</span>
+            </div>
+            <p>Proactive pre-book update drafted by Copilot + sent via Dynamics. Revised ship plan, $45K markdown allowance, evidence package attached. Dynamics CASE-42117 logged.</p>
+            <div class="feed-item__meta">
+              <span>Dynamics 365 · Copilot Studio</span><span>4 min ago</span><span>✉️ Outlook delivered</span>
+            </div>
+          </div>
+          <div class="feed-item" data-risk="chargeback">
+            <div class="feed-item__header">
+              <strong>Three-Way Match — Athletic Warehouse · $340K</strong>
+              <span class="feed-pill feed-pill--critical">Critical</span>
+            </div>
+            <p>Fabric three-way match reconciliation complete. 6 of 8 deductions invalid ($298K). aATP evidence package EVID-58821 assembled.</p>
+            <div class="feed-item__meta">
+              <span>MS Fabric · aATP</span><span>9 min ago</span><span>🔍 Reconciliation</span>
+            </div>
+          </div>
+          <div class="feed-item" data-risk="atp">
+            <div class="feed-item__header">
+              <strong>aATP PAC Confirmed — PO-67508 Athletic Warehouse</strong>
+              <span class="feed-pill feed-pill--good">On Track</span>
+            </div>
+            <p>Summer replen confirmed across 4 DCs. All 14 SKUs allocated per Tier-1 Supply Protection. Ship window: 32 days.</p>
+            <div class="feed-item__meta">
+              <span>Joule Agent (S/4HANA)</span><span>14 min ago</span><span>✅ No risk</span>
+            </div>
+          </div>
+          <div class="feed-item" data-risk="supply">
+            <div class="feed-item__header">
+              <strong>Teams Channel Created — #po-metro-summit-fallPB</strong>
+              <span class="feed-pill feed-pill--watch">Watch</span>
+            </div>
+            <p>Power Automate spun up P1 workflow FLOW-88291. Regional Ops EMEA assigned for Portugal expedite. Rohan Mehta notified via Teams summary card.</p>
+            <div class="feed-item__meta">
+              <span>Power Automate · Teams</span><span>18 min ago</span><span>🎫 P1 open</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>Recent PO Activity</h3>
+            <p>Latest agent resolutions and PO events</p>
+          </div>
+        </div>
+        <div class="order-activity">
+          <div class="order-card order-card--good" data-risk="supply">
+            <span class="order-card__id">PO-67412</span>
+            <span class="order-card__customer">Metro Retail Group</span>
+            <div class="order-card__desc">Fall pre-book. Rotterdam + Portugal air-freight plan. 10 days of floor-set slack preserved.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag fab">FAB</span>
+              <span class="sys-tag s4">aATP</span>
+              <span class="sys-tag d365">D365</span>
+              <span class="sys-tag co">CO</span>
+              <span class="sys-tag pa">PA</span>
+            </div>
+            <span class="order-card__badge">✓ Resolved</span>
+            <span class="order-card__time">2 min ago</span>
+          </div>
+          <div class="order-card order-card--bad" data-risk="chargeback">
+            <span class="order-card__id">8 invoices</span>
+            <span class="order-card__customer">Athletic Warehouse</span>
+            <div class="order-card__desc">$340K deduction cascade. $298K contested via three-way match. $42K to dilution reserve.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag btp">BTP</span>
+              <span class="sys-tag fab">FAB</span>
+              <span class="sys-tag s4">aATP</span>
+              <span class="sys-tag co">CO</span>
+              <span class="sys-tag pa">PA</span>
+            </div>
+            <span class="order-card__badge">⚠ In Dispute</span>
+            <span class="order-card__time">9 min ago</span>
+          </div>
+          <div class="order-card order-card--good" data-risk="atp">
+            <span class="order-card__id">PO-67508</span>
+            <span class="order-card__customer">Athletic Warehouse</span>
+            <div class="order-card__desc">Summer replen · aATP PAC confirmed across 4 DCs. Tier-1 Supply Protection applied.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag s4">aATP</span>
+            </div>
+            <span class="order-card__badge">✓ On Track</span>
+            <span class="order-card__time">14 min ago</span>
+          </div>
+          <div class="order-card order-card--good" data-risk="carrier">
+            <span class="order-card__id">PO-67289</span>
+            <span class="order-card__customer">SportStyle UK</span>
+            <div class="order-card__desc">DHL re-route confirmed after MaerskAP delay. +1 day, within retailer MABD.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag s4">aATP</span>
+              <span class="sys-tag d365">D365</span>
+            </div>
+            <span class="order-card__badge">✓ Re-routed</span>
+            <span class="order-card__time">22 min ago</span>
+          </div>
+          <div class="order-card order-card--watch" data-risk="markdown">
+            <span class="order-card__id">34 POs</span>
+            <span class="order-card__customer">Nordic Sports Co.</span>
+            <div class="order-card__desc">Fleece/down sell-through -18% vs plan. Agent modeling markdown + regional redistribution.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag fab">FAB</span>
+              <span class="sys-tag d365">D365</span>
+            </div>
+            <span class="order-card__badge">⏳ Modeling</span>
+            <span class="order-card__time">31 min ago</span>
+          </div>
+          <div class="order-card order-card--good" data-risk="atp">
+            <span class="order-card__id">PO-67611</span>
+            <span class="order-card__customer">Courts Asia</span>
+            <div class="order-card__desc">Pre-book PAC confirmed · Singapore hub · all 18 SKUs allocated · 38 days to ship.</div>
+            <div class="order-card__sys">
+              <span class="sys-tag s4">aATP</span>
+              <span class="sys-tag d365">D365</span>
+            </div>
+            <span class="order-card__badge">✓ On Track</span>
+            <span class="order-card__time">45 min ago</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-panel" style="border-color: rgba(10,110,209,0.22);">
+        <div class="panel-head">
+          <div>
+            <h3>⚙️ aATP Engine Status</h3>
+            <p>Live health of the S/4HANA Advanced Available-to-Promise + MDG RFM layer</p>
+          </div>
+          <span class="ai-badge" style="background:rgba(10,110,209,0.12);color:#60a5fa;border-color:rgba(10,110,209,0.25);">S/4HANA</span>
+        </div>
+        <div class="aatp-engine">
+          <div class="aatp-engine-grid">
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">PAC Avg Response</span>
+              <span class="aatp-stat__value">118<small>ms</small></span>
+              <span class="aatp-stat__delta">↓ 6ms vs yesterday</span>
+            </div>
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">ABC Hit Rate</span>
+              <span class="aatp-stat__value">91<small>%</small></span>
+              <span class="aatp-stat__delta aatp-stat__delta--watch">↓ 3% (EMEA pressure)</span>
+            </div>
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">BOP Last Run</span>
+              <span class="aatp-stat__value">02:30<small>AM</small></span>
+              <span class="aatp-stat__delta">1,847 POs assessed</span>
+            </div>
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">Supply Protection</span>
+              <span class="aatp-stat__value">Active</span>
+              <span class="aatp-stat__delta">3 retailer tiers live</span>
+            </div>
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">Season Mgmt</span>
+              <span class="aatp-stat__value">Fall '26</span>
+              <span class="aatp-stat__delta">Floor-set May 14 · 88% ready</span>
+            </div>
+            <div class="aatp-stat">
+              <span class="aatp-stat__label">MDG RFM Governance</span>
+              <span class="aatp-stat__value">OK</span>
+              <span class="aatp-stat__delta">Article master · 0 pending</span>
+            </div>
+          </div>
+          <div style="margin-top:0.75rem;">
+            <div class="aatp-run-row">
+              <span class="aatp-run-label">Last BOP Run</span>
+              <span class="aatp-run-value">02:30 AM · 11 POs reconfirmed</span>
+              <span class="aatp-run-badge aatp-run-badge--good">Complete</span>
+            </div>
+            <div class="aatp-run-row">
+              <span class="aatp-run-label">ABC — Peru Cotton Disruption</span>
+              <span class="aatp-run-value">11 of 12 resolved autonomously</span>
+              <span class="aatp-run-badge aatp-run-badge--watch">1 Escalated</span>
+            </div>
+            <div class="aatp-run-row">
+              <span class="aatp-run-label">Product Allocation Check</span>
+              <span class="aatp-run-value">Tier-1 retailers fully protected</span>
+              <span class="aatp-run-badge aatp-run-badge--good">OK</span>
+            </div>
+            <div class="aatp-run-row">
+              <span class="aatp-run-label">Next Scheduled BOP</span>
+              <span class="aatp-run-value">08:30 AM · 1,847 POs in scope</span>
+              <span class="aatp-run-badge aatp-run-badge--good">Scheduled</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-panel">
+        <div class="panel-head">
+          <div>
+            <h3>Retailer OTIF Health</h3>
+            <p>Top &amp; bottom wholesale accounts by OTIF + scorecard</p>
+          </div>
+        </div>
+        <div class="location-list">
+          <div class="loc-row" data-risk="positive">
+            <div class="loc-rank loc-rank--top">1</div>
+            <div class="loc-info"><strong>Metro Retail Group</strong><span>USA · 126 POs · Zero chargebacks · Scorecard 96.4</span></div>
+            <div class="loc-score loc-score--good">98</div>
+          </div>
+          <div class="loc-row" data-risk="positive">
+            <div class="loc-rank loc-rank--top">2</div>
+            <div class="loc-info"><strong>Courts Asia</strong><span>Singapore · 54 POs · 100% OTIF · Scorecard 97.1</span></div>
+            <div class="loc-score loc-score--good">97</div>
+          </div>
+          <div class="loc-row" data-risk="positive">
+            <div class="loc-rank loc-rank--top">3</div>
+            <div class="loc-info"><strong>SportStyle UK</strong><span>London · 48 POs · 1 active re-route · Scorecard 95.8</span></div>
+            <div class="loc-score loc-score--good">96</div>
+          </div>
+          <div class="loc-row" data-risk="positive">
+            <div class="loc-rank loc-rank--top">4</div>
+            <div class="loc-info"><strong>Intersport DACH</strong><span>Germany · 38 POs · Consistent fill rate</span></div>
+            <div class="loc-score loc-score--good">94</div>
+          </div>
+          <div class="loc-divider"><span>⚠️ Needs Attention</span></div>
+          <div class="loc-row" data-risk="markdown">
+            <div class="loc-rank loc-rank--bottom">65</div>
+            <div class="loc-info"><strong>Nordic Sports Co.</strong><span>Pacific NW · 34 POs · Fleece sell-through -18% · markdown pressure</span></div>
+            <div class="loc-score loc-score--watch">82</div>
+          </div>
+          <div class="loc-row" data-risk="chargeback">
+            <div class="loc-rank loc-rank--bottom">66</div>
+            <div class="loc-info"><strong>Athletic Warehouse</strong><span>USA · 84 POs · $1.12M YTD deductions (dispute pipeline)</span></div>
+            <div class="loc-score loc-score--bad">76</div>
+          </div>
+          <div class="loc-row" data-risk="carrier">
+            <div class="loc-rank loc-rank--bottom">67</div>
+            <div class="loc-info"><strong>Meridian Outfitters AU</strong><span>Sydney · 18 POs · MaerskAP exposure · 3 open SLA risks</span></div>
+            <div class="loc-score loc-score--bad">71</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="page-footer">
+    <div class="footer-nav">
+      <a class="footer-link" href="use-cases.html">AI Use Cases</a>
+      <a class="footer-link is-active" href="risk-dashboard.html">Risk Dashboard</a>
+      <a class="footer-link" href="#">Architecture</a>
+      <a class="footer-link" href="#">System Health</a>
+    </div>
+    <p class="footer-copy">Commercial Experience Agent · Retail & Fashion Demo — Meridian Athletic Co. · SAP S/4HANA Core × SAP BTP Hybrid × Microsoft Agentic</p>
+  </footer>
+
+  <script>
+  const html = document.documentElement;
+  const saved = localStorage.getItem('otcTheme') || 'dark';
+  html.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('otcTheme', next);
+  });
+
+  // KPI counter
+  document.querySelectorAll('.hero-kpi__value[data-count]').forEach(el => {
+    const target   = parseFloat(el.dataset.count);
+    const prefix   = el.dataset.prefix || '';
+    const suffix   = el.dataset.suffix || '';
+    const decimals = target % 1 !== 0 ? 1 : 0;
+    const duration = 1800;
+    const start    = performance.now();
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const value = (target * ease).toFixed(decimals);
+      el.textContent = prefix + value + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+
+  // Charts
+  Chart.defaults.color       = '#64748b';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+  Chart.defaults.font.family = '"SF Pro Text", "Helvetica Neue", sans-serif';
+  Chart.defaults.font.size   = 11;
+
+  const acctCtx = document.getElementById('accountChart').getContext('2d');
+  new Chart(acctCtx, {
+    type: 'bar',
+    data: {
+      labels: [
+        'Metro Retail Group','Courts Asia','SportStyle UK','Intersport DACH',
+        'Decathlon Partners','Sportsmart JP (resolving)','Nordic Sports Co.','Athletic Warehouse','Meridian Outfitters AU'
+      ],
+      datasets: [{
+        data: [98, 97, 96, 94, 92, 83, 82, 76, 71],
+        backgroundColor: [
+          '#10b981','#10b981','#10b981','#10b981','#10b981',
+          '#f59e0b','#f59e0b','#ef4444','#ef4444'
+        ],
+        borderRadius: 4, borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `  ${ctx.raw}% OTIF` } }
+      },
+      scales: {
+        x: { min: 40, max: 100, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => v + '%' } },
+        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+
+  const riskCtx = document.getElementById('riskChart').getContext('2d');
+  new Chart(riskCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Supplier Delay','Chargeback / Deduction','Carrier Failure','Markdown Pressure','ATP Shortfall','EDI Integration Error'],
+      datasets: [{
+        label: '% of Resolved Risks',
+        data: [31, 24, 18, 12, 9, 6],
+        backgroundColor: ['#ff453a','#ff453a','#ff9f0a','#ff9f0a','#2997ff','#2997ff'],
+        borderRadius: 4, borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `  ${ctx.raw}% of all risks this week` } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => v + '%' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Heatmap
+  const heatData = {
+    days:  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    times: ['0:00','4:00','8:00','12:00','16:00','20:00'],
+    values: [
+      [1,2,4,5,6,3],
+      [2,3,6,7,8,4],
+      [1,3,7,6,8,5],
+      [2,2,5,5,7,3],
+      [1,3,8,7,9,5],
+      [0,1,2,3,3,2],
+      [0,1,2,1,2,1]
+    ]
+  };
+  function riskColor(v) {
+    const t = v / 9;
+    if (t < 0.2) return `rgba(16,185,129,${0.1 + t * 0.5})`;
+    if (t < 0.5) return `rgba(245,158,11,${0.2 + t * 0.6})`;
+    return `rgba(239,68,68,${0.2 + t * 0.8})`;
+  }
+  const grid = document.getElementById('heatmapGrid');
+  grid.innerHTML += '<div class="heatmap-label"></div>';
+  heatData.times.forEach(t => { grid.innerHTML += `<div class="heatmap-col-label">${t}</div>`; });
+  heatData.days.forEach((day, di) => {
+    grid.innerHTML += `<div class="heatmap-label">${day}</div>`;
+    heatData.values[di].forEach((val, ti) => {
+      grid.innerHTML += `<div class="heatmap-cell" style="background:${riskColor(val)}" title="${day} ${heatData.times[ti]} — Risk level: ${val}/9"></div>`;
+    });
+  });
+
+  // Map
+  const map = L.map('locationMap', { zoomControl: false, attributionControl: false }).setView([25, 20], 2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap contributors © CartoDB', maxZoom: 14
+  }).addTo(map);
+  L.control.attribution({ prefix: false, position: 'bottomright' }).addTo(map);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+  function marker(color, size, pulse) {
+    const shadow = pulse ? `box-shadow:0 0 0 0 ${color};animation:mapPulse 1.5s infinite;` : `box-shadow:0 0 6px ${color};`;
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};${shadow}border:2px solid rgba(255,255,255,0.35);"></div>`,
+      iconSize: [size, size], iconAnchor: [size/2, size/2]
+    });
+  }
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `@keyframes mapPulse { 0%{box-shadow:0 0 0 0 rgba(239,68,68,0.7);} 70%{box-shadow:0 0 0 10px rgba(239,68,68,0);} 100%{box-shadow:0 0 0 0 rgba(239,68,68,0);} }`;
+  document.head.appendChild(styleEl);
+
+  // Critical: Peru mill, Athletic Warehouse DC, Sydney
+  const critical = [
+    [-7.16, -78.51, 'PERU-CAJAMARCA-01 Mill · 14-day cotton delay · 12 POs at risk · $9.4M'],
+    [41.88, -87.63, 'Athletic Warehouse (Chicago DC) · Deduction cascade · $340K ($298K disputed)'],
+    [-33.87, 151.21, 'Meridian Outfitters AU (Sydney) · MaerskAP APAC lane exposure'],
+  ];
+  critical.forEach(([lat, lng, popup]) => {
+    L.marker([lat, lng], { icon: marker('#ef4444', 13, true) })
+      .bindPopup(`<span style="font-size:12px;font-family:'SF Pro Text','Helvetica Neue',sans-serif;">${popup}</span>`)
+      .addTo(map);
+  });
+
+  const atRisk = [
+    [47.61, -122.33, 'Nordic Sports Co. (Seattle) · Mild winter · markdown pressure · 34 POs'],
+    [1.29, 103.85, 'Singapore Hub · APAC transit variance +2d · 11 POs'],
+    [41.00, 28.98, 'Istanbul mill · capacity watch · 6 POs'],
+  ];
+  atRisk.forEach(([lat, lng, popup]) => {
+    L.marker([lat, lng], { icon: marker('#f59e0b', 11, false) })
+      .bindPopup(`<span style="font-size:12px;font-family:'SF Pro Text','Helvetica Neue',sans-serif;">${popup}</span>`)
+      .addTo(map);
+  });
+
+  const onTrack = [
+    [51.92, 4.48, 'Rotterdam DC · Active · Metro Summit partial en route'],
+    [38.70, -9.14, 'Portugal mill partner (VFX-02) · fabric expedite raised via aATP ABC'],
+    [32.78, -96.80, 'Metro Retail Group (Dallas HQ) · $6.8M pre-book · Agent resolved ✓'],
+    [33.75, -84.39, 'Atlanta DC · Metro Summit air freight inbound'],
+    [51.50, -0.13, 'SportStyle UK (London) · re-route confirmed ✓'],
+    [52.52, 13.40, 'Intersport DACH (Berlin) · 38 POs nominal'],
+    [19.08, 72.88, 'Mumbai DC · 22 POs nominal'],
+    [35.68, 139.69, 'Sportsmart JP (Tokyo) · re-routing'],
+    [1.35, 103.87, 'Courts Asia (Singapore) · 54 POs · 100% OTIF'],
+    [48.85, 2.35, 'Decathlon Partners (Paris) · Fall window confirmed'],
+  ];
+  onTrack.forEach(([lat, lng, popup]) => {
+    L.marker([lat, lng], { icon: marker('#10b981', 10, false) })
+      .bindPopup(`<span style="font-size:12px;font-family:'SF Pro Text','Helvetica Neue',sans-serif;">${popup}</span>`)
+      .addTo(map);
+  });
+
+  function filterByRisk(val) {
+    const all = document.querySelectorAll('[data-risk]');
+    all.forEach(el => {
+      if (val === 'all' || el.dataset.risk === val || el.dataset.risk === 'positive') {
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+    updateAlertCount();
+  }
+  function updateAlertCount() {
+    const visible = document.querySelectorAll('#alertList .alert-item:not([style*="display: none"])').length;
+    document.getElementById('alertCount').textContent = visible + ' active';
+  }
+  function resolveAlert(btn) {
+    const item = btn.closest('.alert-item');
+    item.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    item.style.opacity = '0';
+    item.style.transform = 'translateX(20px)';
+    setTimeout(() => { item.remove(); updateAlertCount(); }, 420);
+  }
+
+  // Live feed ticker
+  const newEvents = [
+    { risk: 'chargeback', title: 'Dispute Submitted — Athletic Warehouse · $298K', pill: 'feed-pill--watch', pillText: 'In Flight',
+      body: 'Power Automate submitted dispute AW-DISP-22041 via retailer AP portal. Copilot letter + aATP evidence package attached. Expected recovery ~$232K (78% historical win-rate).', meta: 'Power Automate · Copilot', time: 'just now', icon: '💼' },
+    { risk: 'atp', title: 'aATP PAC Confirmed — PO-67611 Courts Asia', pill: 'feed-pill--good', pillText: 'On Track',
+      body: 'Singapore hub confirmed 18 of 18 SKUs for Fall pre-book. Supply Protection Tier-1 honoured. Ship window: 38 days.', meta: 'Joule Agent (S/4HANA)', time: '1 min ago', icon: '✅' },
+  ];
+  let eventIdx = 0;
+  setInterval(() => {
+    if (eventIdx >= newEvents.length) return;
+    const ev = newEvents[eventIdx++];
+    const feed = document.getElementById('feedList');
+    const div = document.createElement('div');
+    div.className = 'feed-item feed-item-new';
+    div.dataset.risk = ev.risk;
+    div.innerHTML = `
+      <div class="feed-item__header">
+        <strong>${ev.title}</strong>
+        <span class="feed-pill ${ev.pill}">${ev.pillText}</span>
+      </div>
+      <p>${ev.body}</p>
+      <div class="feed-item__meta">
+        <span>${ev.meta}</span><span>${ev.time}</span><span>${ev.icon}</span>
+      </div>`;
+    feed.insertBefore(div, feed.firstChild);
+    const items = feed.querySelectorAll('.feed-item');
+    if (items.length > 7) items[items.length - 1].remove();
+  }, 12000);
+  </script>
+
+</body>
+</html>

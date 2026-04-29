@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commercial Agent Demo — Retail & Fashion · S/4HANA Core × BTP Hybrid × Microsoft Agentic</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface2: #2c2c2e;
+      --border: rgba(255,255,255,0.12);
+      --text: #f5f5f7;
+      --muted: #86868b;
+      --accent: #2997ff;
+      --accent2: #409cff;
+      --sap-blue: #0A6ED1;
+      --ms-blue: #0078D4;
+      --ms-teal: #00B7C3;
+      --ms-purple: #8661C5;
+      --ms-magenta: #B4009E;
+      --ms-green: #107C10;
+      --btp-indigo: #6366F1;
+    }
+    [data-theme="light"] {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --surface2: #f5f5f7;
+      --border: rgba(0,0,0,0.1);
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --accent: #0071e3;
+      --accent2: #0077ed;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "SF Pro Display", "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 0 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 44px;
+    }
+    [data-theme="light"] header { background: rgba(245,245,247,0.85); border-bottom-color: rgba(0,0,0,0.1); }
+    .wordmark {
+      font-size: 0.85rem; font-weight: 600; letter-spacing: -0.01em;
+      color: var(--text);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .wordmark .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
+    .theme-toggle {
+      background: transparent; border: none;
+      color: var(--accent); padding: 0.3rem 0.6rem; border-radius: 980px;
+      cursor: pointer; font-size: 0.78rem;
+      font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: -0.01em;
+      transition: background 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(41,151,255,0.12); }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 7rem 22px 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(41,151,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(41,151,255,0.1); border: 1px solid rgba(41,151,255,0.25);
+      color: var(--accent2); padding: 0.35rem 1rem; border-radius: 980px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase; margin-bottom: 1.75rem;
+      backdrop-filter: blur(10px);
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 600; letter-spacing: -0.015em; line-height: 1.05;
+      margin-bottom: 1.25rem;
+      font-family: "SF Pro Display", "Helvetica Neue", sans-serif;
+    }
+    .hero h1 span { color: var(--accent2); }
+    .hero p {
+      font-size: 1.05rem; color: var(--muted); max-width: 640px;
+      margin: 0 auto 3rem; line-height: 1.6;
+      letter-spacing: -0.01em;
+    }
+    .hero-context {
+      font-size: 0.78rem; color: var(--muted); max-width: 620px;
+      margin: -1.25rem auto 3rem; opacity: 0.75;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── ARCHITECTURE PILLS ── */
+    .arch-pills {
+      display: flex; justify-content: center; gap: 0.6rem;
+      flex-wrap: wrap; margin-bottom: 5rem;
+    }
+    .pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem; border-radius: 980px;
+      font-size: 0.78rem; font-weight: 500; border: 1px solid;
+      letter-spacing: -0.01em;
+      backdrop-filter: blur(10px);
+    }
+    .pill.lean  { background: rgba(41,151,255,0.1);  border-color: rgba(41,151,255,0.25);  color: #5ac8fa; }
+    .pill.hybrid{ background: rgba(94,92,230,0.1);   border-color: rgba(94,92,230,0.28);   color: #bf8afc; }
+    .pill.agentic{background: rgba(134,97,197,0.12); border-color: rgba(134,97,197,0.3); color: #c9a8ff; }
+    .pill-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .pill.lean   .pill-dot { background: #5ac8fa; }
+    .pill.hybrid .pill-dot { background: #bf8afc; }
+    .pill.agentic .pill-dot { background: #c9a8ff; }
+
+    /* ── DEMO CARDS ── */
+    .section-label {
+      text-align: center;
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 22px 6rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex; flex-direction: column;
+      transition: transform 0.3s cubic-bezier(.4,0,.6,1), box-shadow 0.3s cubic-bezier(.4,0,.6,1), border-color 0.3s;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 24px 52px rgba(0,0,0,0.5);
+      border-color: rgba(41,151,255,0.3);
+    }
+    .card-preview {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      font-size: 3.5rem;
+    }
+    .card-preview.usecases { background: linear-gradient(135deg, #0d1117 0%, #142037 50%, #0d1117 100%); }
+    .card-preview.dashboard{ background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%); }
+    .card-preview .preview-glow {
+      position: absolute; inset: 0; opacity: 0.5;
+    }
+    .card-preview.usecases .preview-glow { background: radial-gradient(ellipse at center, rgba(41,151,255,0.22) 0%, transparent 70%); }
+    .card-preview.dashboard .preview-glow{ background: radial-gradient(ellipse at center, rgba(10,110,209,0.2) 0%, transparent 70%); }
+
+    /* Use-cases card mockup */
+    .mockup-usecases {
+      background: #0d1117;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      padding: 8px;
+    }
+    .mockup-usecases .uc-tile {
+      background: rgba(41,151,255,0.10);
+      border: 1px solid rgba(41,151,255,0.22);
+      border-radius: 4px;
+      height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mockup-usecases .uc-tile.featured {
+      grid-column: span 4;
+      height: 30px;
+      background: linear-gradient(90deg, rgba(41,151,255,0.32), rgba(90,200,250,0.18));
+      border-color: rgba(41,151,255,0.42);
+      position: relative;
+    }
+    .mockup-usecases .uc-tile.featured::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      animation: shimmer 2.6s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer { 0%,100%{ opacity:0; } 50%{ opacity:1; } }
+
+    .mockup {
+      position: relative; z-index: 1;
+      width: 220px; height: 110px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      font-size: 0;
+    }
+    .mockup-story {
+      background: #0d1117;
+      display: flex; flex-direction: column; gap: 5px; padding: 10px;
+    }
+    .mockup-story .ms-title  { height: 10px; width: 60%; background: rgba(255,255,255,0.6); border-radius: 3px; }
+    .mockup-story .ms-sub    { height: 7px; width: 80%; background: rgba(255,255,255,0.2); border-radius: 3px; }
+    .mockup-story .ms-kpis   { display: flex; gap: 5px; margin-top: 6px; }
+    .mockup-story .ms-kpi    { flex: 1; height: 28px; border-radius: 5px; background: rgba(99,102,241,0.25); border: 1px solid rgba(99,102,241,0.3); }
+    .mockup-story .ms-flow   { display: flex; align-items: center; gap: 3px; margin-top: 6px; }
+    .mockup-story .ms-node   { width: 22px; height: 14px; border-radius: 3px; background: rgba(255,255,255,0.12); }
+    .mockup-story .ms-arrow  { flex: 1; height: 1px; background: rgba(255,255,255,0.2); }
+
+    .mockup-console {
+      background: #0d1117;
+      display: flex; gap: 5px; padding: 8px;
+    }
+    .mockup-console .mc-left { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .mockup-console .mc-right { flex: 1.5; display: flex; flex-direction: column; gap: 4px; }
+    .mockup-console .mc-line { height: 5px; border-radius: 2px; }
+    .mc-msblue  { background: rgba(0,120,212,0.75); }
+    .mc-msteal  { background: rgba(0,183,195,0.75); }
+    .mc-mspurp  { background: rgba(134,97,197,0.75); }
+    .mc-msmag   { background: rgba(180,0,158,0.75); }
+    .mc-blue    { background: rgba(10,110,209,0.7); }
+    .mc-indigo  { background: rgba(99,102,241,0.7); }
+    .mc-dim     { background: rgba(255,255,255,0.12); }
+    .mockup-console .mc-bubble {
+      background: rgba(255,255,255,0.06); border-radius: 4px;
+      padding: 4px 5px; display: flex; flex-direction: column; gap: 3px;
+    }
+
+    .mockup-dashboard {
+      background: #0d1117;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 8px;
+    }
+    .md-map {
+      grid-row: span 2; background: rgba(10,110,209,0.12);
+      border: 1px solid rgba(10,110,209,0.2); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .md-kpi {
+      background: rgba(255,255,255,0.05); border-radius: 4px;
+      display: flex; flex-direction: column; gap: 2px; padding: 4px;
+    }
+    .md-kpi-val { height: 8px; width: 55%; background: rgba(255,255,255,0.5); border-radius: 2px; }
+    .md-kpi-lbl { height: 4px; width: 80%; background: rgba(255,255,255,0.2); border-radius: 2px; }
+    .md-bar {
+      grid-column: span 2; background: rgba(255,255,255,0.04);
+      border-radius: 4px; padding: 4px 6px; display: flex; flex-direction: column; gap: 3px;
+    }
+    .md-bar-row { display: flex; align-items: center; gap: 4px; }
+    .md-bar-lbl { width: 28px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+    .md-bar-fill { height: 4px; border-radius: 2px; }
+
+    .card-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+    .card-tag {
+      font-size: 0.66rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; line-height: 1.25; letter-spacing: -0.01em; }
+    .card p  { font-size: 0.875rem; color: var(--muted); line-height: 1.6; flex: 1; letter-spacing: -0.005em; }
+    .card-cta {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      margin-top: 1.25rem;
+      font-size: 0.82rem; font-weight: 400; color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+    .card-cta svg { transition: transform 0.24s cubic-bezier(.4,0,.6,1); }
+    .card:hover .card-cta svg { transform: translateX(4px); }
+    .card-accent-line {
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    }
+    .card-accent-line.usecases  { background: linear-gradient(90deg, var(--accent), transparent); }
+    .card-accent-line.dashboard { background: linear-gradient(90deg, var(--sap-blue), transparent); }
+
+    /* ── SYSTEM BADGES ── */
+    .systems {
+      display: flex; justify-content: center; gap: 1.25rem;
+      flex-wrap: wrap; padding-bottom: 5rem;
+    }
+    .sys-badge {
+      display: flex; flex-direction: column; align-items: center; gap: 0.45rem;
+    }
+    .sys-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em;
+      border: 1px solid;
+      transition: transform 0.2s cubic-bezier(.4,0,.6,1);
+    }
+    .sys-icon:hover { transform: scale(1.08); }
+    .sys-icon.s4     { background: rgba(41,151,255,0.12);  border-color: rgba(41,151,255,0.28);  color: #5ac8fa; }
+    .sys-icon.aatp   { background: rgba(10,110,209,0.18);  border-color: rgba(10,110,209,0.35);  color: #60a5fa; }
+    .sys-icon.btp    { background: rgba(94,92,230,0.12);   border-color: rgba(94,92,230,0.3);    color: #bf8afc; }
+    .sys-icon.fabric { background: rgba(0,183,195,0.1);    border-color: rgba(0,183,195,0.3);    color: #5eead4; }
+    .sys-icon.d365   { background: rgba(0,120,212,0.12);   border-color: rgba(0,120,212,0.32);   color: #4da3ff; }
+    .sys-icon.copilot{ background: rgba(134,97,197,0.12);  border-color: rgba(134,97,197,0.32);  color: #c9a8ff; }
+    .sys-icon.teams  { background: rgba(98,100,167,0.15);  border-color: rgba(98,100,167,0.35);  color: #a0a3e6; }
+    .sys-icon.power  { background: rgba(180,0,158,0.1);    border-color: rgba(180,0,158,0.3);    color: #f472b6; }
+    .sys-label { font-size: 0.67rem; color: var(--muted); letter-spacing: -0.005em; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center; padding: 2rem 22px;
+      font-size: 0.78rem; color: var(--muted);
+      letter-spacing: -0.01em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-badge   { animation: fadeUp 0.5s ease both; }
+    .hero h1      { animation: fadeUp 0.5s 0.1s ease both; }
+    .hero p       { animation: fadeUp 0.5s 0.2s ease both; }
+    .hero-context { animation: fadeUp 0.5s 0.25s ease both; }
+    .arch-pills   { animation: fadeUp 0.5s 0.3s ease both; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">
+    <span class="dot"></span>
+    Commercial Agent · Retail & Fashion Demo Suite
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()">☀ / ☾</button>
+</header>
+
+<section class="hero">
+  <div class="hero-badge">⚡ Agentic Enterprise Demo · B2B Wholesale</div>
+  <h1>Commercial<br/><span>Experience Agent</span></h1>
+  <p>An autonomous multi-agent system for B2B apparel wholesale — protecting revenue, eliminating chargebacks, and preserving retailer scorecards at machine speed, across every pre-book, replenishment, and in-season order.</p>
+  <p class="hero-context">Demo scenario: <strong style="color:var(--text);">Meridian Athletic Co.</strong> — a generic $2.1B premium athletic apparel brand selling to 68 wholesale accounts across 24 countries.</p>
+
+  <div class="arch-pills">
+    <span class="pill lean">
+      <span class="pill-dot"></span>SAP S/4HANA + aATP · Lean Core
+    </span>
+    <span class="pill hybrid">
+      <span class="pill-dot"></span>SAP BTP / BDC · Hybrid Edge
+    </span>
+    <span class="pill agentic">
+      <span class="pill-dot"></span>Microsoft Fabric · Dynamics 365 · Copilot Studio · Teams · Power Automate · Agentic Edge
+    </span>
+  </div>
+</section>
+
+<p class="section-label">Two ways to explore the agent</p>
+
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(360px,1fr));max-width:920px;">
+
+  <!-- CARD 1: AI Use Cases -->
+  <a class="card" href="use-cases.html">
+    <div class="card-accent-line usecases"></div>
+    <div class="card-preview usecases">
+      <div class="preview-glow"></div>
+      <div class="mockup mockup-usecases">
+        <div class="uc-tile featured"></div>
+        <div class="uc-tile"></div>
+        <div class="uc-tile"></div>
+        <div class="uc-tile"></div>
+        <div class="uc-tile"></div>
+        <div class="uc-tile"></div>
+        <div class="uc-tile"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tag">Capability Catalog</div>
+      <h2>Seven AI Use Cases</h2>
+      <p>Every place AI plugs into the wholesale OTC flow — Prepack auto-selection, Sales-order completion, VAS re-determination, Stock-protection transparency, Pricing data prep, TPO/PTO change feasibility, POD capture → auto-billing. Each card shows today's pain, the AI capability, and the business impact. Includes one live storyboard for the hero capability.</p>
+      <span class="card-cta">Browse use cases <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </div>
+  </a>
+
+  <!-- CARD 2: Risk Dashboard -->
+  <a class="card" href="risk-dashboard.html">
+    <div class="card-accent-line dashboard"></div>
+    <div class="card-preview dashboard">
+      <div class="preview-glow"></div>
+      <div class="mockup mockup-dashboard">
+        <div class="md-map">🗺</div>
+        <div class="md-kpi"><div class="md-kpi-val"></div><div class="md-kpi-lbl"></div></div>
+        <div class="md-kpi"><div class="md-kpi-val" style="background:rgba(255,54,33,0.6)"></div><div class="md-kpi-lbl"></div></div>
+        <div class="md-bar">
+          <div class="md-bar-row"><div class="md-bar-lbl"></div><div class="md-bar-fill" style="width:80%;background:rgba(34,197,94,0.6)"></div></div>
+          <div class="md-bar-row"><div class="md-bar-lbl"></div><div class="md-bar-fill" style="width:55%;background:rgba(251,191,36,0.6)"></div></div>
+          <div class="md-bar-row"><div class="md-bar-lbl"></div><div class="md-bar-fill" style="width:35%;background:rgba(239,68,68,0.6)"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-tag">CFO Cockpit</div>
+      <h2>Commercial Risk Dashboard</h2>
+      <p>The leadership cockpit — OTIF, fill rate, retailer scorecards, season readiness, chargebacks avoided, margin leakage recovered. Global retailer + supplier risk map, AI insights, alert centre, aATP engine status, and a live use-case inventory across 1,847 open POs and 68 wholesale accounts.</p>
+      <span class="card-cta">Open the dashboard <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </div>
+  </a>
+
+</div>
+
+<p class="section-label">Powered by</p>
+<div class="systems" style="max-width:920px;margin:0 auto 0;">
+  <div class="sys-badge"><div class="sys-icon s4">S/4</div><span class="sys-label">SAP S/4HANA</span></div>
+  <div class="sys-badge"><div class="sys-icon aatp">aATP</div><span class="sys-label">SAP aATP</span></div>
+  <div class="sys-badge"><div class="sys-icon btp">BTP</div><span class="sys-label">SAP BTP / BDC</span></div>
+  <div class="sys-badge"><div class="sys-icon fabric">FAB</div><span class="sys-label">MS Fabric</span></div>
+  <div class="sys-badge"><div class="sys-icon d365">D365</div><span class="sys-label">Dynamics 365</span></div>
+  <div class="sys-badge"><div class="sys-icon copilot">CO</div><span class="sys-label">Copilot Studio</span></div>
+  <div class="sys-badge"><div class="sys-icon teams">TMS</div><span class="sys-label">MS Teams</span></div>
+  <div class="sys-badge"><div class="sys-icon power">PA</div><span class="sys-label">Power Automate</span></div>
+</div>
+
+<footer style="margin-top:5rem;">
+  Commercial Agent Demo Suite &nbsp;·&nbsp; SAP S/4HANA Core × SAP BTP Hybrid × Microsoft Agentic &nbsp;·&nbsp; B2B Retail & Fashion
+</footer>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  }
+</script>
+</body>
+</html>
